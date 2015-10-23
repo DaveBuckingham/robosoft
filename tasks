@@ -1,0 +1,45 @@
+Tasks from our meeting today.
+Fri Oct 23 17:37:31 EDT 2015
+
+EL:
+gamepad_interface.py
+A small, standalone, platform independent, program that reads from a gamepad and prints (id, val) tuples to stdout.
+Example output:
+A 1
+A 0
+X 1
+X 0
+Ax_1_Y 0.0001
+Ax_1_Y 0.0301
+Ax_1_Y 0.0740
+Ax_1_Y 0.0432
+Ax_1_Y 0.0021
+Ax_1_Y 0.0000
+
+JM:
+ui_hub.py
+Python program.
+Runs gamepad_interface.py as a subprocess.
+Reads output from gamepad_interface.py and maps it to 4-tuples.
+Calls motor_command_transmitter, passing a 4-tuple.
+
+DB:
+motor_command_transmitter.py
+Contains a function, will be include dby up_hub.py.
+Input is a 4-tuple (L, W, left, right) e.g. {2.3, 4.2, 0, 1}
+L is in [0, pinout_max]
+W is in [0, pinout_max]
+Transmits data via usb to microcontroller
+
+motor_command_receiver.h/c
+receives data via usb from laptop.
+Returns 4-tuple.
+
+main.cpp
+calls motor_command_receiver() and motor_interface()
+
+AC:
+motor_interface.h/c
+contains a function that takes a 4-tuple (L, W, left, right) as input,
+ignores 'left' and 'right', checks L and W to make sure they are valid
+voltages to set pinouts, and set pinouts.
