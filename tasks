@@ -44,4 +44,7 @@ AC:
 motor_interface.h/c
 contains a function that takes a 4-tuple (L, W, left, right) as input,
 ignores 'left' and 'right', checks L and W to make sure they are valid
-voltages to set pinouts, and set pinouts.
+voltages to set pinouts, and set pinouts. It might return true on success
+false on failure (e.g. invalid voltage).
+Function header should look something like:
+int motor_interface(float speed, float wavelength, int motor_1, int motor_2);
