@@ -22,6 +22,8 @@ Python program.
 Runs gamepad_interface.py as a subprocess.
 Reads output from gamepad_interface.py and maps it to 4-tuples.
 Calls motor_command_transmitter, passing a 4-tuple.
+So four arguments to motor_command_transmitter with type:
+float, float, bool, bool
 
 DB:
 motor_command_transmitter.py
