@@ -33,18 +33,26 @@ L is in [0, pinout_max]
 W is in [0, pinout_max]
 Transmits data via usb to microcontroller
 
-motor_command_receiver.h/c
+motor_command_receiver()
 receives data via usb from laptop.
 Returns 4-tuple.
 
-main.cpp
-calls motor_command_receiver() and motor_interface()
-
 AC:
-motor_interface.h/c
+motor_interface()
 contains a function that takes a 4-tuple (L, W, left, right) as input,
 ignores 'left' and 'right', checks L and W to make sure they are valid
 voltages to set pinouts, and set pinouts. It might return true on success
 false on failure (e.g. invalid voltage).
 Function header should look something like:
 int motor_interface(float speed, float wavelength, int motor_1, int motor_2);
+
+NOTE ON ARDUINO CODE:
+Instead of the various .c and .h files I propsed yesterday,
+lets make compiling super simple by putting everything in a
+single .ino file.
+We can always split it up later if we need to.
+Let's call it botwurst_a.ino
+It will contain two functions:
+motor_interface()  written by AC
+motor_command_receiver() written by DB
+
