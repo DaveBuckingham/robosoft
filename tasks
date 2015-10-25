@@ -16,6 +16,10 @@ Ax_1_Y 0.0432
 Ax_1_Y 0.0021
 Ax_1_Y 0.0000
 
+Notes from Ethan:
+ - using the PyGame 1.9.2 for Python 2.7 library to implement this
+ - running python 2.7.10 on my windows machine which I am using for development
+
 JM:
 ui_hub.py
 Python program.
