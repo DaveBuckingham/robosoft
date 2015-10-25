@@ -44,7 +44,8 @@ ignores 'left' and 'right', checks L and W to make sure they are valid
 voltages to set pinouts, and set pinouts. It might return true on success
 false on failure (e.g. invalid voltage).
 Function header should look something like:
-int motor_interface(float speed, float wavelength, int motor_1, int motor_2);
+boolean motor_interface(motor_command);
+
 
 NOTE ON ARDUINO CODE:
 Instead of the various .c and .h files I propsed yesterday,
@@ -53,6 +54,6 @@ single .ino file.
 We can always split it up later if we need to.
 Let's call it botwurst_a.ino
 It will contain two functions:
-motor_interface()  written by AC
-motor_command_receiver() written by DB
+get_motor_command() written by DB
+set_pins()  written by AC
 
