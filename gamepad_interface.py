@@ -14,4 +14,4 @@ pygame.joystick.init()
 
 #
 joysticks = pygame.joystick.get_count()
-#print str(joysticks) + " joystick(s) detected!"
+print str(joysticks) + " joystick(s) detected!"
