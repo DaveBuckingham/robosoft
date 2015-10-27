@@ -2,6 +2,15 @@
 #define TIMEOUT 1000
 #define BAUD 9600
 #define SERIAL_CONFIG SERIAL_8N1
+#define LOWVOLTAGE 0   //the currently arbitrary low boundary for output voltage
+#define HIGHVOLTAGE 20 //the currently arbitrary high boundary for output voltage
+
+//In general, designated output pins send voltage out from the arduino to connected devices
+//For this test, pin 13 has an LED that will turn on with a certain voltage sent out
+#define OUTPIN 13     
+//In general, if we ever want to read voltages in from the arduino to get feedback from
+//the robot, it can be done using the input pins
+#define INPIN 12
 
 float wave_speed;
 float wavelength;
@@ -94,17 +103,27 @@ boolean get_motor_command () {
 void setup() {
     Serial.begin(BAUD);
     Serial.println("Ready");  // we might want to read this
+    pinMode(OUTPIN, OUTPUT);  //designates OUTPIN pin to be an output
+    pinMode(INPIN, INPUT);    //designates INPIN pin to be an input
 }
 
 
-boolean set_pins() {
-    // FOR ALEX
+boolean set_pins() { //FOR ALEX
+    float voltage = wave_speed*wavelength;
+    if((voltage <= HIGHVOLTAGE) && (voltage >= LOWVOLTAGE)){
+        digitalWrite(OUTPIN, voltage); //sends "voltage" to pin OUTPIN, which turns LED on
+        //Serial.print("Reading in voltage: ");
+        //Serial.println(digitalRead(INPIN)); //should we ever decide to read in voltages
+        return true;
+    }
+    digitalWrite(OUTPIN, 0); //sends zero voltage, turns off the LED
+    return false;
 }
 
 
 void loop() {
     if (get_motor_command) {
-        // set_pins();
+        set_pins();
         
         // FOR TESTING
         delay(LOOP_DELAY);
