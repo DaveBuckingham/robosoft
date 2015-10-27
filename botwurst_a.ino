@@ -2,8 +2,8 @@
 #define TIMEOUT 1000
 #define BAUD 9600
 #define SERIAL_CONFIG SERIAL_8N1
-#define LOWVOLTAGE 0   //the currently arbitrary low boundary for output voltage
-#define HIGHVOLTAGE 20 //the currently arbitrary high boundary for output voltage
+#define LOWVOLTAGE 0   //the low boundary for output voltage
+#define HIGHVOLTAGE 255 //the high boundary for output voltage
 
 //In general, designated output pins send voltage out from the arduino to connected devices
 //For this test, pin 13 has an LED that will turn on with a certain voltage sent out
