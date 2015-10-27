@@ -6,8 +6,10 @@
 #define HIGHVOLTAGE 255 //the high boundary for output voltage
 
 //In general, designated output pins send voltage out from the arduino to connected devices
-//For this test, pin 13 has an LED that will turn on with a certain voltage sent out
-#define OUTPIN 13     
+//For testing, pin 13 has an LED that will turn on with a certain voltage sent out
+//The analog pins on the Mega are A0-A5
+#define OUTPIN1 A0
+#define OUTPIN2 A1
 //In general, if we ever want to read voltages in from the arduino to get feedback from
 //the robot, it can be done using the input pins
 #define INPIN 12
