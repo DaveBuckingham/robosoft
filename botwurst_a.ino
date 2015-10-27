@@ -107,7 +107,7 @@ void loop() {
         // set_pins();
         
         // FOR TESTING
-        delay(100);
+        delay(LOOP_DELAY);
         Serial.print(wave_speed);
         Serial.print("\t");
         Serial.print(wavelength);
