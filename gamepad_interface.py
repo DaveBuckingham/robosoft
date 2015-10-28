@@ -2,8 +2,13 @@
 GAMEPAD INTERFACE
 Ethan Laverack
 
-Description: Uses PyGame library to pull data off of gamepad and send axis
+Description: Uses PyGame joystick library to pull data off of gamepad and send axis
              and button states to ui_hub through standard out
+
+FOR REFERENCE: https://www.pygame.org/docs/ref/joystick.html
+
+INPUT: nothing, but needs gamepad plugged in to function
+OUTPUT: prints button/axis states to standard out upon change
 
 xBox 360 Button/Axis Assignments:
     Buttons (1 for Pressed, 0 for not):
@@ -23,11 +28,8 @@ xBox 360 Button/Axis Assignments:
         2 = Triggers (Left: 1, Right: -1, Niether: 0)
         3 = Right Stick Y (1 = down)
         4 = Right Stick X (1 = right)
-    D-Pad/Hat (Neither: 0,0):
-        Up = 1
-        Right = 1
-        Down = -1
-        Left = -1
+    D-Pad/Hat (Neither: (x,y) = (0,0)):
+        (right, up) = (1,1)
 '''
 
 # get the pygame library
