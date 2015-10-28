@@ -2,7 +2,7 @@
 # MOTOR COMMAND TRANSMITTER
 # DAVID BUCKINGHAM
 #
-# IN: (float lambda, float wavelength, bool motor_1, bool motor_2)
+# IN: (uint_8 lambda, uint_8 wavelength, bool motor_1, bool motor_2)
 # OUT: true (success) / false (failed)
 # 
 # DESCRIPTION:
@@ -16,6 +16,9 @@ import struct
 class mctransmitter:
     connection = None
 
+    # INITIALIZE SERIAL CONNECTION
+    # NO NEED TO CALL THIS EXPLICITELY
+    # CALLED AUTOMATICALLY ON FIRST CALL TO send_motor_command()
     @staticmethod
     def initialize():
         mctransmitter.connection = serial.Serial(
@@ -27,24 +30,29 @@ class mctransmitter:
             bytesize=serial.EIGHTBITS
         )
 
+
+    # CLOSE SERIAL CONNECTION
+    # CALL THIS IF YOU'R ALL DONE COMMUNICATING
+    # WE CAN PROBABLY SKIP CALLING THIS
     @staticmethod
     def close():
         connection.close
+
 
     # SEND MOTOR COMMAND OVER THE WIRE
     @staticmethod
     def send_motor_command(speed, wavelength, motor_1, motor_2):
         if (mctransmitter.connection == None):
-            a = 0
-            #mctransmitter.initialize()
+            mctransmitter.initialize()
 
         start_flag = ':'
         ack = ':'
-        packed = struct.pack('!cff??', start_flag, speed, wavelength, motor_1, motor_2)
-        print packed
+        packed = struct.pack('!cBB??', start_flag, speed, wavelength, motor_1, motor_2)
 
-        #mctransmitter.connection.write(packed)
-        #time.sleep(0.1)
+        mctransmitter.connection.write(packed)
+        time.sleep(0.1)
+
+        # WE PROBABLY DONT NEED TO USE ACKS
         #line = mctransmitter.connection.readline()
         #if (line == ack):
         #    return True
@@ -52,6 +60,6 @@ class mctransmitter:
         #    return False
 
 #TEST
-mctransmitter.send_motor_command(1.2, 3.2, True, False)
+#mctransmitter.send_motor_command(74, 212, True, False)
 
 
