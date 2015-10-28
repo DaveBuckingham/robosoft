@@ -8,7 +8,8 @@
 //In general, designated output pins send voltage out from the arduino to connected devices
 //For testing, pin 13 has an LED that will turn on with a certain voltage sent out
 //The analog pins on the Mega are A0-A5
-#define OUTPIN A0
+#define OUTPIN0 A0
+#define OUTPIN1 A1
 //In general, if we ever want to read voltages in from the arduino to get feedback from
 //the robot, it can be done using the input pins
 #define INPIN 12
@@ -68,20 +69,30 @@ boolean get_motor_command () {
 void setup() {
     Serial.begin(BAUD);
     Serial.println("Ready");  // we might want to read this
-    pinMode(OUTPIN, OUTPUT);  //designates OUTPIN pin to be an output
+    pinMode(OUTPIN0, OUTPUT); //designates OUTPIN0 pin to be an output
+    pinMode(OUTPIN1, OUTPUT); //designates OUTPIN1 pin to be an input
     pinMode(INPIN, INPUT);    //designates INPIN pin to be an input
 }
 
 
 boolean set_pins() {
-    float voltage = wave_speed*wavelength;
-    if((voltage <= HIGHVOLTAGE) && (voltage >= LOWVOLTAGE)){
-        digitalWrite(OUTPIN, voltage); //sends "voltage" to pin OUTPIN, which turns LED on
+    boolean speedValid = 0;
+    boolean lengthValid = 0;
+    if((wave_speed <= HIGHVOLTAGE) && (wave_speed >= LOWVOLTAGE)){
+        speedValid = 1;
+    }
+    if((wavelength <= HIGHVOLTAGE) && (wavelength >= LOWVOLTAGE)){
+        lengthValid = 1;
+    }
+    if((lengthValid==1) && (speedValid==1)){
+        analogWrite(OUTPIN0, wave_speed); //sends "wave_speed" to pin OUTPIN0
+        analogWrite(OUTPIN1, wavelength); //sends "wavelength" to pin OUTPIN1
         //Serial.print("Reading in voltage: ");
         //Serial.println(digitalRead(INPIN)); //should we ever decide to read in voltages
         return true;
     }
-    digitalWrite(OUTPIN, 0); //sends zero voltage, turns off the LED
+    analogWrite(OUTPIN0, 0); //sends zero voltage, turns off the LED
+    analogWrite(OUTPIN1, 0);
     return false;
 }
 
