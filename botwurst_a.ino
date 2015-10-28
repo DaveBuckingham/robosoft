@@ -10,9 +10,11 @@
 //The analog pins on the Mega are A0-A5
 #define OUTPIN0 A0
 #define OUTPIN1 A1
+#define OUTPIN2 13
+#define OUTPIN3 12
 //In general, if we ever want to read voltages in from the arduino to get feedback from
 //the robot, it can be done using the input pins
-#define INPIN 12
+#define INPIN 7
 
 # IN FACT THESE ARE EACH 8 BITS
 byte wave_speed;
@@ -71,6 +73,8 @@ void setup() {
     Serial.println("Ready");  // we might want to read this
     pinMode(OUTPIN0, OUTPUT); //designates OUTPIN0 pin to be an output
     pinMode(OUTPIN1, OUTPUT); //designates OUTPIN1 pin to be an input
+    pinMode(OUTPIN2, OUTPUT);
+    pinMode(OUTPIN3, OUTPUT);
     pinMode(INPIN, INPUT);    //designates INPIN pin to be an input
 }
 
@@ -87,12 +91,16 @@ boolean set_pins() {
     if((lengthValid==1) && (speedValid==1)){
         analogWrite(OUTPIN0, wave_speed); //sends "wave_speed" to pin OUTPIN0
         analogWrite(OUTPIN1, wavelength); //sends "wavelength" to pin OUTPIN1
+        digitalWrite(OUTPIN2, motor_0);   //sends on or off (0 or 1) to pin OUTPIN2
+        digitalWrite(OUTPIN3, motor_1);   //sends on or off (0 or 1) to pin OUTPIN3
         //Serial.print("Reading in voltage: ");
         //Serial.println(digitalRead(INPIN)); //should we ever decide to read in voltages
         return true;
     }
     analogWrite(OUTPIN0, 0); //sends zero voltage, turns off the LED
     analogWrite(OUTPIN1, 0);
+    digitalWrite(OUTPIN2, 0);
+    digitalWrite(OUTPIN3, 0);
     return false;
 }
 
