@@ -9,6 +9,12 @@ import serial
 import struct
 
 class mctransmitter:
+
+    # SET THESE DO MODIFY BEHAVIOR
+    __TEST__       = False  # GENERATE DATA TO TRANSMIT
+    __DEBUG__      = False  # AFTER TRANSMIT WAIT FOR RESPONSE AND PRINT IT
+
+
     __START_FLAG__ = ":"
     __CONNECTION__ = None
 
@@ -63,14 +69,16 @@ class mctransmitter:
         # BUT IT MEANS WAITING
         # MAKE SURE ARDUINO IS SENDING DATA
         # I.E. "#define DEBUG"
-        # return mctransmitter.__CONNECTION__.readline()
+        if __DEBUG__:
+            return mctransmitter.__CONNECTION__.readline()
 
 
-# TEST
-#i = 1;
-#while (True):
-#    m1 = i % 2 == 0
-#    m2 = i % 2 == 1
-#    print mctransmitter.send_motor_command(i % 256, (i + 128) % 256, m1, m2)
-#    i += 1
+if __TEST__:
+    # TEST
+    i = 1;
+    while (True):
+        m1 = i % 2 == 0
+        m2 = i % 2 == 1
+        print mctransmitter.send_motor_command(i % 256, (i + 128) % 256, m1, m2)
+        i += 1
 

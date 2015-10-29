@@ -10,7 +10,12 @@
 //                                                              //
 //////////////////////////////////////////////////////////////////
 
-#define DEBUG
+
+// UNCOMMONT THESE TO SET OUTPUT
+
+//#define DEBUG              // ECHO INPUT BACK OVER SERIAL
+//#define WRITE_TO_PINS      // WRITE OUT TO I/O PINS
+
 
 //////////////////////////////////////
 //            CONSTANTS             //
@@ -83,12 +88,12 @@ boolean get_motor_command () {
         }
     }
 
-#ifdef DEBUG
+    #ifdef DEBUG
     // ECHO THE COMMANDS
     char buffer[20];
     sprintf(buffer, "%u %u %u %u\n", wave_speed, wavelength, motor_0, motor_1);
     Serial.print(buffer);
-#endif
+    #endif
 
     return true;
 }
@@ -116,10 +121,10 @@ void setup() {
     pinMode(OUTPIN3, OUTPUT);
     pinMode(INPIN, INPUT);    //designates INPIN pin to be an input
 
-#ifdef DEBUG
+    #ifdef DEBUG
     // REPORT
     Serial.println("botwurst_a ready...");
-#endif
+    #endif
 
 }
 
@@ -160,7 +165,9 @@ boolean set_pins() {
 
 void loop() {
     if (get_motor_command()) {
-        //set_pins();
+        #ifdef WRITE_TO_PINS
+        set_pins();
+        #endif
     }
     delay(LOOP_DELAY);
 }
