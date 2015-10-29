@@ -1,11 +1,6 @@
-
 # MOTOR COMMAND TRANSMITTER
 # DAVID BUCKINGHAM
 #
-# IN: (uint_8 lambda, uint_8 wavelength, bool motor_1, bool motor_2)
-# OUT: true (success) / false (failed)
-# 
-# DESCRIPTION:
 # Transmittes the received motor command 4-tuple
 # to a receiver on the microcontroller.
 
@@ -14,16 +9,21 @@ import serial
 import struct
 
 class mctransmitter:
-    connection = None
+    __START_FLAG__ = ":"
+    __CONNECTION__ = None
+
+
+    ##############################
+    #     INITIALIZE COM         #
+    ##############################
 
     # INITIALIZE SERIAL CONNECTION
-    # NO NEED TO CALL THIS EXPLICITELY
     # CALLED AUTOMATICALLY ON FIRST CALL TO send_motor_command()
     @staticmethod
     def initialize():
-        mctransmitter.connection = serial.Serial(
+        mctransmitter.__CONNECTION__ = serial.Serial(
             #port='/dev/serial/by-id/AAAAA',
-            port='/dev/ttyUSB1',
+            port='/dev/ttyACM0',
             baudrate=9600,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
@@ -31,35 +31,46 @@ class mctransmitter:
         )
 
 
-    # CLOSE SERIAL CONNECTION
-    # CALL THIS IF YOU'R ALL DONE COMMUNICATING
-    # WE CAN PROBABLY SKIP CALLING THIS
+    ##############################
+    #          CLSOE COM         #
+    ##############################
+
+    # PROBABLY NEVER NEED TO CALL THIS
     @staticmethod
     def close():
-        connection.close
+        __CONNECTION__.close
 
+
+    ##############################
+    #         TRANSMIT           #
+    ##############################
 
     # SEND MOTOR COMMAND OVER THE WIRE
     @staticmethod
     def send_motor_command(speed, wavelength, motor_1, motor_2):
-        if (mctransmitter.connection == None):
+        if (mctransmitter.__CONNECTION__ == None):
             mctransmitter.initialize()
 
-        start_flag = ':'
-        ack = ':'
-        packed = struct.pack('!cBB??', start_flag, speed, wavelength, motor_1, motor_2)
+        # CONVERTS VALUES TO C DATATYPES
+        # "!" MEANS BIG ENDIAN
+        # "cBB??" MEANS "char, unsigned char, unsigned char, _Bool, _Bool"
+        packed = struct.pack('!cBB??', mctransmitter.__START_FLAG__, speed, wavelength, motor_1, motor_2)
 
-        mctransmitter.connection.write(packed)
-        time.sleep(0.1)
+        # SEND IT OUT
+        mctransmitter.__CONNECTION__.write(packed)
 
-        # WE PROBABLY DONT NEED TO USE ACKS
-        #line = mctransmitter.connection.readline()
-        #if (line == ack):
-        #    return True
-        #else:
-        #    return False
+        # CALLER MIGHT WANT THIS
+        # BUT IT MEANS WAITING
+        # MAKE SURE ARDUINO IS SENDING DATA
+        # I.E. "#define DEBUG"
+        # return mctransmitter.__CONNECTION__.readline()
 
-#TEST
-#mctransmitter.send_motor_command(74, 212, True, False)
 
+# TEST
+#i = 1;
+#while (True):
+#    m1 = i % 2 == 0
+#    m2 = i % 2 == 1
+#    print mctransmitter.send_motor_command(i % 256, (i + 128) % 256, m1, m2)
+#    i += 1
 
