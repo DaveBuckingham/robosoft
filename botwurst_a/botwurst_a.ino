@@ -1,83 +1,132 @@
-#define LOOP_DELAY 100
-#define TIMEOUT 1000
+//////////////////////////////////////////////////////////////////
+//                                                              //
+//                       -- BOTWURST A --                       //
+//                                                              //
+//                          ALEX COHEN                          //
+//                       DAVE BUCKINGHAM                        //
+//                                                              //
+//       RECIEVES MOTOR COMMANDS OVER USB AND SETS ANALOG       //
+//       AND DIGITLA PINS.                                      //
+//                                                              //
+//////////////////////////////////////////////////////////////////
+
+#define DEBUG
+
+//////////////////////////////////////
+//            CONSTANTS             //
+//////////////////////////////////////
+
+// SERIAL COMMUNICATION
+#define LOOP_DELAY 10  // MILLISECONDS
 #define BAUD 9600
 #define SERIAL_CONFIG SERIAL_8N1
-#define LOWVOLTAGE 0   //the low boundary for output voltage
-#define HIGHVOLTAGE 255 //the high boundary for output voltage
 
-//In general, designated output pins send voltage out from the arduino to connected devices
-//For testing, pin 13 has an LED that will turn on with a certain voltage sent out
-//The analog pins on the Mega are A0-A5
-#define OUTPIN0 A0
+// PIN IO
+#define LOWVOLTAGE 0    //the low boundary for output voltage
+#define HIGHVOLTAGE 255 //the high boundary for output voltage
+#define OUTPIN0 A0      //The analog pins on the Mega are A0-A5
 #define OUTPIN1 A1
 #define OUTPIN2 13
 #define OUTPIN3 12
-//In general, if we ever want to read voltages in from the arduino to get feedback from
-//the robot, it can be done using the input pins
-#define INPIN 7
+#define INPIN 7         // input pin to get feedback from robot
 
-# IN FACT THESE ARE EACH 8 BITS
+
+//////////////////////////////////////
+//           VARIABLES              //
+//////////////////////////////////////
+
+// COMMAND VALUES
 byte wave_speed;
 byte wavelength;
-boolean motor_0;
-boolean motor_1;
+byte motor_0;
+byte motor_1;
 
-byte read_integer
-unsigned long timer;
-char read_char
+// TO HOLD PACKET HEADDER
+char flag;
+
+// FOR ITERATING OVER THE FOUR COMMAND VALUES
+#define NUM_COMMANDS 4
+byte* command_pointers[NUM_COMMANDS];
+int i;
 
 
-# LISTEN FOR 4 BYTES
-# STORE IN GLOBAL VARIABLES
-# RETURN FALSE IF IT TAKES TOO LONG
-# OTHERWISE RETURN TRUE
+//////////////////////////////////////
+//        GET MOTOR COMMAND         //
+//////////////////////////////////////
+
+// READ 4 BYTES AND STORE IN GLOBAL VARIABLES
+// RETURN TRUE IF 4 VALUES READ, ELSE FALSE
 boolean get_motor_command () {
-    timer = millis();
 
-    # IF THERE ARE INCOMMING BYTES
-    # WAIT SO ALL THE DATA CAN ARRIVE
-    # CHECK FOR START FLAG ':'
+    // IF THERE ARE INCOMMING BYTES
+    // CHECK FOR START FLAG ':'
     if (! Serial.available()) {
         return false;
     }
-    read_char = Serial.read();
-    delay(100);  // Wait for all data
-    while (read_char != ':' && Serial.available()) {
-        read_char = Serial.read();
+    flag = Serial.read();
+    delay(100);  // WAIT FOR ALL DATA
+    while (flag != ':' && Serial.available()) {
+        flag = Serial.read();
     }
-    if (read_char != ':') {
+    if (flag != ':') {
         return false;
     }
 
+    // ITERATE OVER COMMANDS
+    // STORING VALUES READ FROM SERIAL
+    for (i= 0; i < NUM_COMMANDS; i++) {
+        if (Serial.available()) {
+            *command_pointers[i] = Serial.read();
+        }
+        else {
+            return false;
+        }
+    }
 
-    if ((millis() - timer) > TIMEOUT) { return false; }
-
-    wave_speed = Serial.parseInt();
-    if ((millis() - timer) > TIMEOUT) { return false; }
-
-    wavelength = Serial.parseInt();
-    if ((millis() - timer) > TIMEOUT) { return false; }
-
-    motor_0 = Serial.parseInt();
-    if ((millis() - timer) > TIMEOUT) { return false; }
-
-    motor_1 = Serial.parseInt();
-    if ((millis() - timer) > TIMEOUT) { return false; }
+#ifdef DEBUG
+    // ECHO THE COMMANDS
+    char buffer[20];
+    sprintf(buffer, "%u %u %u %u\n", wave_speed, wavelength, motor_0, motor_1);
+    Serial.print(buffer);
+#endif
 
     return true;
 }
 
 
+//////////////////////////////////////
+//           INTIIALIZE             //
+//////////////////////////////////////
+
 void setup() {
+    // SET UP INPUT
     Serial.begin(BAUD);
-    Serial.println("Ready");  // we might want to read this
+    command_pointers[0] = &wave_speed;
+    command_pointers[1] = &wavelength;
+    command_pointers[2] = &motor_0;
+    command_pointers[3] = &motor_1;
+    for (i= 0; i < NUM_COMMANDS; i++) {
+        *command_pointers[i] = 0;
+    }
+
+    // SET UP OUTPUT
     pinMode(OUTPIN0, OUTPUT); //designates OUTPIN0 pin to be an output
     pinMode(OUTPIN1, OUTPUT); //designates OUTPIN1 pin to be an input
     pinMode(OUTPIN2, OUTPUT);
     pinMode(OUTPIN3, OUTPUT);
     pinMode(INPIN, INPUT);    //designates INPIN pin to be an input
+
+#ifdef DEBUG
+    // REPORT
+    Serial.println("botwurst_a ready...");
+#endif
+
 }
 
+
+//////////////////////////////////////
+//        WRITE TO PINS             //
+//////////////////////////////////////
 
 boolean set_pins() {
     boolean speedValid = 0;
@@ -105,21 +154,13 @@ boolean set_pins() {
 }
 
 
-void loop() {
-    if (get_motor_command) {
-        set_pins();
-        
-        // FOR TESTING
-        //delay(LOOP_DELAY);
-        //Serial.print(wave_speed);
-        //Serial.print("\t");
-        //Serial.print(wavelength);
-        //Serial.print("\t");
-        //Serial.print(motor_0);
-        //Serial.print("\t");
-        //Serial.print(motor_1);
-        //Serial.println("\t");
+//////////////////////////////////////
+//           MAIN LOOP              //
+//////////////////////////////////////
 
+void loop() {
+    if (get_motor_command()) {
+        //set_pins();
     }
-    delay(LOOP_DELAY)
+    delay(LOOP_DELAY);
 }
