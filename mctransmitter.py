@@ -10,12 +10,6 @@ import struct
 
 class mctransmitter:
 
-    # SET THESE DO MODIFY BEHAVIOR
-    __TEST__       = False  # GENERATE DATA TO TRANSMIT
-    __DEBUG__      = False  # AFTER TRANSMIT WAIT FOR RESPONSE AND PRINT IT
-
-
-    __START_FLAG__ = ":"
     __CONNECTION__ = None
 
 
@@ -51,34 +45,25 @@ class mctransmitter:
     #         TRANSMIT           #
     ##############################
 
-    # SEND MOTOR COMMAND OVER THE WIRE
+    # DIGITAL COMMAND
+    # 2 DIGITAL PINS SO pin_index IN [0,1]
+    # BINARY STATE SO value IN [True, False]
     @staticmethod
-    def send_motor_command(speed, wavelength, motor_1, motor_2):
+    def send_digital_command(pin_index, value):
         if (mctransmitter.__CONNECTION__ == None):
             mctransmitter.initialize()
-
-        # CONVERTS VALUES TO C DATATYPES
-        # "!" MEANS BIG ENDIAN
-        # "cBB??" MEANS "char, unsigned char, unsigned char, _Bool, _Bool"
-        packed = struct.pack('!cBB??', mctransmitter.__START_FLAG__, speed, wavelength, motor_1, motor_2)
-
-        # SEND IT OUT
+        packed = struct.pack('!c?', 'd', pin_index, value)
         mctransmitter.__CONNECTION__.write(packed)
+        return mctransmitter.__CONNECTION__.readline()
 
-        # CALLER MIGHT WANT THIS
-        # BUT IT MEANS WAITING
-        # MAKE SURE ARDUINO IS SENDING DATA
-        # I.E. "#define DEBUG"
-        if __DEBUG__:
-            return mctransmitter.__CONNECTION__.readline()
-
-
-if __TEST__:
-    # TEST
-    i = 1;
-    while (True):
-        m1 = i % 2 == 0
-        m2 = i % 2 == 1
-        print mctransmitter.send_motor_command(i % 256, (i + 128) % 256, m1, m2)
-        i += 1
+    # ANALOG COMMAND
+    # 2 ANALOG PINS SO pin_index IN [0,1]
+    # value IN [0, 255]
+    @staticmethod
+    def send_analog_command(pin_index, value):
+        if (mctransmitter.__CONNECTION__ == None):
+            mctransmitter.initialize()
+        packed = struct.pack('!cB', 'a', pin_index, value)
+        mctransmitter.__CONNECTION__.write(packed)
+        return mctransmitter.__CONNECTION__.readline()
 

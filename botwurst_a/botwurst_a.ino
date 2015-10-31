@@ -11,92 +11,36 @@
 //////////////////////////////////////////////////////////////////
 
 
-// UNCOMMONT THESE TO SET OUTPUT
-
-//#define DEBUG              // ECHO INPUT BACK OVER SERIAL
-//#define WRITE_TO_PINS      // WRITE OUT TO I/O PINS
-
-
 //////////////////////////////////////
 //            CONSTANTS             //
 //////////////////////////////////////
 
 // SERIAL COMMUNICATION
-#define LOOP_DELAY 10  // MILLISECONDS
+#define LOOP_DELAY 10     // MILLISECONDS
+#define SERIAL_DELAY 100  // MILLISECONDS
 #define BAUD 9600
 #define SERIAL_CONFIG SERIAL_8N1
 
-// PIN IO
-#define LOWVOLTAGE 0    //the low boundary for output voltage
-#define HIGHVOLTAGE 255 //the high boundary for output voltage
-#define OUTPIN0 A0      //The analog pins on the Mega are A0-A5
-#define OUTPIN1 A1
-#define OUTPIN2 13
-#define OUTPIN3 12
-#define INPIN 7         // input pin to get feedback from robot
+#define ANALOG_HI     255
+
+//The analog pins on the Mega are A0-A5
+#define ANALOG_PIN_0  A0
+#define ANALOG_PIN_1  A1
+
+#define DIGITAL_PIN_0 13
+#define DIGITAL_PIN_1 12 
+
+#define NUM_DIGITAL_PINS 2
+#define NUM_ANALOG_PINS 2
 
 
 //////////////////////////////////////
 //           VARIABLES              //
 //////////////////////////////////////
 
-// COMMAND VALUES
-byte wave_speed;
-byte wavelength;
-byte motor_0;
-byte motor_1;
-
-// TO HOLD PACKET HEADDER
-char flag;
-
-// FOR ITERATING OVER THE FOUR COMMAND VALUES
-#define NUM_COMMANDS 4
-byte* command_pointers[NUM_COMMANDS];
-int i;
-
-
-//////////////////////////////////////
-//        GET MOTOR COMMAND         //
-//////////////////////////////////////
-
-// READ 4 BYTES AND STORE IN GLOBAL VARIABLES
-// RETURN TRUE IF 4 VALUES READ, ELSE FALSE
-boolean get_motor_command () {
-
-    // IF THERE ARE INCOMMING BYTES
-    // CHECK FOR START FLAG ':'
-    if (! Serial.available()) {
-        return false;
-    }
-    flag = Serial.read();
-    delay(100);  // WAIT FOR ALL DATA
-    while (flag != ':' && Serial.available()) {
-        flag = Serial.read();
-    }
-    if (flag != ':') {
-        return false;
-    }
-
-    // ITERATE OVER COMMANDS
-    // STORING VALUES READ FROM SERIAL
-    for (i= 0; i < NUM_COMMANDS; i++) {
-        if (Serial.available()) {
-            *command_pointers[i] = Serial.read();
-        }
-        else {
-            return false;
-        }
-    }
-
-    #ifdef DEBUG
-    // ECHO THE COMMANDS
-    char buffer[20];
-    sprintf(buffer, "%u %u %u %u\n", wave_speed, wavelength, motor_0, motor_1);
-    Serial.print(buffer);
-    #endif
-
-    return true;
-}
+byte pin_index;
+char pin_type;
+char buffer[16];
 
 
 //////////////////////////////////////
@@ -104,58 +48,14 @@ boolean get_motor_command () {
 //////////////////////////////////////
 
 void setup() {
-    // SET UP INPUT
     Serial.begin(BAUD);
-    command_pointers[0] = &wave_speed;
-    command_pointers[1] = &wavelength;
-    command_pointers[2] = &motor_0;
-    command_pointers[3] = &motor_1;
-    for (i= 0; i < NUM_COMMANDS; i++) {
-        *command_pointers[i] = 0;
-    }
 
-    // SET UP OUTPUT
-    pinMode(OUTPIN0, OUTPUT); //designates OUTPIN0 pin to be an output
-    pinMode(OUTPIN1, OUTPUT); //designates OUTPIN1 pin to be an input
-    pinMode(OUTPIN2, OUTPUT);
-    pinMode(OUTPIN3, OUTPUT);
-    pinMode(INPIN, INPUT);    //designates INPIN pin to be an input
+    pinMode(ANALOG_PIN_0, OUTPUT);
+    pinMode(ANALOG_PIN_1, OUTPUT);
+    pinMode(DIGITAL_PIN_0, OUTPUT);
+    pinMode(DIGITAL_PIN_1, OUTPUT);
 
-    #ifdef DEBUG
-    // REPORT
     Serial.println("botwurst_a ready...");
-    #endif
-
-}
-
-
-//////////////////////////////////////
-//        WRITE TO PINS             //
-//////////////////////////////////////
-
-boolean set_pins() {
-    boolean speedValid = 0;
-    boolean lengthValid = 0;
-    if((wave_speed <= HIGHVOLTAGE) && (wave_speed >= LOWVOLTAGE)){
-        speedValid = 1;
-    }
-    if((wavelength <= HIGHVOLTAGE) && (wavelength >= LOWVOLTAGE)){
-        lengthValid = 1;
-    }
-    if((lengthValid==1) && (speedValid==1)){
-        analogWrite(OUTPIN0, wave_speed); //sends "wave_speed" to pin OUTPIN0
-        analogWrite(OUTPIN1, wavelength); //sends "wavelength" to pin OUTPIN1
-        digitalWrite(OUTPIN2, motor_0);   //sends on or off (0 or 1) to pin OUTPIN2
-        digitalWrite(OUTPIN3, motor_1);   //sends on or off (0 or 1) to pin OUTPIN3
-        //Serial.print("Reading in voltage: ");
-        //Serial.println(digitalRead(INPIN)); //should we ever decide to read in voltages
-        return true;
-    }
-    analogWrite(OUTPIN0, 0); //sends zero voltage, turns off the LED
-    analogWrite(OUTPIN1, 0);
-    digitalWrite(OUTPIN2, 0);
-    digitalWrite(OUTPIN3, 0);
-    return false;
 }
 
 
@@ -164,10 +64,91 @@ boolean set_pins() {
 //////////////////////////////////////
 
 void loop() {
-    if (get_motor_command()) {
-        #ifdef WRITE_TO_PINS
-        set_pins();
-        #endif
+
+    //////////////////////////
+    //     GET PIN TYPE     //
+    //////////////////////////
+    if (! Serial.available()) {
+        continue;
     }
-    delay(LOOP_DELAY);
+    pin_type = Serial.read();
+    if (pin_type != 'a' && pin_type != 'd') {
+        Serial.print("Invalid pin type.\n");
+        continue;
+    }
+    delay(SERIAL_DELAY);  // WAIT FOR PIN INDEX AND VALUE
+
+    if (! Serial.available()) {
+        continue;
+    }
+
+    pin_index = Serial.read();
+
+    if (! Serial.available()) {
+        continue;
+    }
+
+    //////////////////////////
+    //    ANALOG PIN        //
+    //////////////////////////
+    if (pin_type == 'a') {
+
+        // CHECK INDEX BOUNDS
+        if (pin_index < 0 || pin_index >= NUM_ANALOG_PINS) {
+            Serial.print("Index out of range.\n");
+            continue;
+        }
+
+        // READ PIN VALUE
+        pin_value = Serial.read();
+        if (pin_value < 0 || pin_value > ANALOG_HI) {
+            Serial.print("Pin value out of range.\n");
+            continue;
+        }
+
+        // WRITE TO PIN  (COULD USE ARRAY)
+        if (pin_index == 0) {
+            analogWrite(ANALOG_PIN_0, pin_value);
+        }
+        else if (pin_index == 1) {
+            analogWrite(ANALOG_PIN_1, pin_value);
+        }
+    }
+
+    //////////////////////////
+    //    DIGITIAL PIN      //
+    //////////////////////////
+    else {  // pin_type == 'd'
+
+        // CHECK INDEX BOUNDS
+        if (pin_index < 0 || pin_index >= NUM_DIGITAL_PINS) {
+            Serial.print("Index out of range.\n");
+            continue;
+        }
+
+        // READ PIN VALUE
+        pin_value = Serial.read();
+        if (pin_value < 0 || pin_value > 1) {
+            Serial.print("Pin value out of range.\n");
+            continue;
+        }
+
+        // WRITE TO PIN
+        if (pin_index == 0) {
+            digitalWrite(DIGITAL_PIN_0, pin_value);
+        }
+        else if (pin_index == 1) {
+            digitalWrite(DIGITAL_PIN_1, pin_value);
+        }
+    }
+
+    //////////////////////////
+    //   SEND CONFIRMATION  //
+    //////////////////////////
+    sprintf(buffer, "%u %u\n", pin_index, pin_value);
+    Serial.print(buffer);
+
+    // delay(LOOP_DELAY);  // IS THIS NEEDED?
 }
+
+
