@@ -94,7 +94,7 @@ A   -> Hold for Motor 2
     print "Use 'select' button to cycle control modes."
 
 
-display()
+#display()
 
 
 # TODO python documentation suggests using subprocess32
