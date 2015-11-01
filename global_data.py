@@ -6,6 +6,7 @@ analog_1  = 0;
 digital_0 = False;
 digital_1 = False;
 
+# (CURRENLTY, NOTHING WRITES TO THIS -db)
 # RESPONSE RECIEVED FROM ARDUINO
 analog_0_confirmed  = 0;
 analog_1_confirmed  = 0;

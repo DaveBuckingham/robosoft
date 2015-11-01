@@ -18,7 +18,8 @@ class mctransmitter:
     ##############################
 
     # INITIALIZE SERIAL CONNECTION
-    # CALLED AUTOMATICALLY ON FIRST CALL TO send_motor_command()
+    # CALLED AUTOMATICALLY ON FIRST
+    # CALL TO tx_digital() or tx_analog()
     @staticmethod
     def initialize():
         mctransmitter.__CONNECTION__ = serial.Serial(
@@ -49,7 +50,7 @@ class mctransmitter:
     # 2 DIGITAL PINS SO pin_index IN [0,1]
     # BINARY STATE SO value IN [True, False]
     @staticmethod
-    def send_digital_command(pin_index, value):
+    def tx_digital(pin_index, value):
         if (mctransmitter.__CONNECTION__ == None):
             mctransmitter.initialize()
         packed = struct.pack('!c?', 'd', pin_index, value)
@@ -60,7 +61,7 @@ class mctransmitter:
     # 2 ANALOG PINS SO pin_index IN [0,1]
     # value IN [0, 255]
     @staticmethod
-    def send_analog_command(pin_index, value):
+    def tx_analog(pin_index, value):
         if (mctransmitter.__CONNECTION__ == None):
             mctransmitter.initialize()
         packed = struct.pack('!cB', 'a', pin_index, value)
