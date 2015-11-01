@@ -20,10 +20,7 @@ scale_analog(val):   # [-1,1] -> [0,255]
     return (((val + 1) * ANALOG_MAX) / 2)
 
 scale_digital(val):  # [anything] -> [False, True]
-    if (val > 0):
-        return True
-    else:
-        return False
+    return (val > 0)
 
 
 # WHEN WE GET A BUTTON EVENT FROM gampad_interface() CHECK
