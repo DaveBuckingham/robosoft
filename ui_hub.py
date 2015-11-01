@@ -9,9 +9,28 @@ import subprocess
 import os
 
 import mctransmitter  # COM WITH ARDUINO
-import global_state   # SHARED WITH ui_display AND ui_map
+import global_data    # SHARED WITH ui_display AND ui_map
 import ui_map         # MAP BUTTON EVENTS TO PIN COMMANDS
 import ui_display     # VISUAL DISPLAY
+
+
+# PASS BUTTON VALUES THROUGH THESE
+# BEFORE SENDING THEM TO MAP
+scale_analog(val):   # [-1,1] -> [0,255]
+    return (((val + 1) * ANALOG_MAX) / 2)
+
+scale_digital(val):  # [anything] -> [False, True]
+    if (val > 0):
+        return True
+    else:
+        return False
+
+
+# WHEN WE GET A BUTTON EVENT FROM gampad_interface() CHECK
+# IF ITS THE 'SELECT' BUTTON. IF SO, INCREMENT TO NEXT MAP
+# IN THIS LIST. OTHERWISE, PASS IT TO THE CURRENT MAP.
+map_list = [simple_map(), toggle_map()]
+
 
 
 # TODO python documentation suggests using subprocess32
