@@ -21,3 +21,4 @@ BUTTON_A = 2
 BUTTON_B = 3
 AXIS_0   = 0
 AXIS_1   = 1
+SELECT = 6
