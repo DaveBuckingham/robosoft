@@ -6,7 +6,7 @@
 //                       DAVE BUCKINGHAM                        //
 //                                                              //
 //       RECIEVES MOTOR COMMANDS OVER USB AND SETS ANALOG       //
-//       AND DIGITLA PINS.                                      //
+//       AND DIGITAL PINS.                                      //
 //                                                              //
 //////////////////////////////////////////////////////////////////
 
@@ -23,9 +23,13 @@
 
 #define ANALOG_HI     255
 
-//The analog pins on the Mega are A0-A5
-#define ANALOG_PIN_0  A0
-#define ANALOG_PIN_1  A1
+//The analog input pins on the Mega are A0-A5
+#define ANALOG_INPUT_0  A0
+#define ANALOG_INPUT_1  A1
+
+//The digital pins on the Mega can also act as analog output
+#define ANALOG_PIN_0 10
+#define ANALOG_PIN_1 9
 
 #define DIGITAL_PIN_0 13
 #define DIGITAL_PIN_1 12 
