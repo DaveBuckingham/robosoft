@@ -16,17 +16,17 @@ import ui_display     # VISUAL DISPLAY
 
 # PASS BUTTON VALUES THROUGH THESE
 # BEFORE SENDING THEM TO MAP
-scale_analog(val):   # [-1,1] -> [0,255]
+def scale_analog(val):   # [-1,1] -> [0,255]
     return (((val + 1) * ANALOG_MAX) / 2)
 
-scale_digital(val):  # [anything] -> [False, True]
+def scale_digital(val):  # [anything] -> [False, True]
     return (val > 0)
 
 
 # WHEN WE GET A BUTTON EVENT FROM gampad_interface() CHECK
 # IF ITS THE 'SELECT' BUTTON. IF SO, INCREMENT TO NEXT MAP
 # IN THIS LIST. OTHERWISE, PASS IT TO THE CURRENT MAP.
-map_list = [simple_map(), toggle_map()]
+map_list = [ui_map.simple_map(), ui_map.toggle_map()]
 
 
 
@@ -36,7 +36,7 @@ map_list = [simple_map(), toggle_map()]
 def gamepad_to_motor_command_transmitter(whatever_would_be_input_to_gamepad_subprocess):
     proc = subprocess.Popen(['python', '-u', 'game_interface.py'], stdout=subprocess.PIPE)
 
-   for line in iter(proc.stdout.readline,''):
+    for line in iter(proc.stdout.readline,''):
         #parse line to get variables
         speed = 0
         wavelength = 0
