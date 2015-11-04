@@ -27,10 +27,10 @@ R2  -> Frequency"""
         elif (button == global_data.BUTTON_A):
             global_data.digital_1 = val
             mctransmitter.tx_digital(1, val)
-        elif (button == global_data.AXIS_0):
+        elif (button == global_data.AXIS_Y_RIGHT_STICK):
             global_data.analog_0 = val
             mctransmitter.tx_analog(0, val)
-        elif (button == global_data.AXIS_1):
+        elif (button == global_data.AXIS_Y_LEFT_STICK):
             global_data.analog_1 = val
             mctransmitter.tx_analog(1, val)
         
@@ -51,10 +51,10 @@ R2  -> Frequency"""
         elif (button == global_data.BUTTON_A and val):
             global_data.digital_1 = not global_data_digital_1
             mctransmitter.tx_digital(1, global_data.digital_1)
-        elif (button == global_data.AXIS_0):
+        elif (button == global_data.AXIS_Y_RIGHT_STICK)):
             global_data.analog_0 = val
             mctransmitter.tx_analog(0, val)
-        elif (button == global_data.AXIS_1):
+        elif (button == global_data.AXIS_X_RIGHT_STICK):
             global_data.analog_1 = val
             mctransmitter.tx_analog(1, val)
  
