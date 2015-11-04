@@ -30,6 +30,7 @@ class mctransmitter:
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS
         )
+        return mctransmitter.__CONNECTION__.readline()
 
 
     ##############################
@@ -53,7 +54,7 @@ class mctransmitter:
     def tx_digital(pin_index, value):
         if (mctransmitter.__CONNECTION__ == None):
             mctransmitter.initialize()
-        packed = struct.pack('!c?', 'd', pin_index, value)
+        packed = struct.pack('!cB?', 'd', pin_index, value)
         mctransmitter.__CONNECTION__.write(packed)
         return mctransmitter.__CONNECTION__.readline()
 
@@ -64,7 +65,6 @@ class mctransmitter:
     def tx_analog(pin_index, value):
         if (mctransmitter.__CONNECTION__ == None):
             mctransmitter.initialize()
-        packed = struct.pack('!cB', 'a', pin_index, value)
+        packed = struct.pack('!cBB', 'a', pin_index, value)
         mctransmitter.__CONNECTION__.write(packed)
         return mctransmitter.__CONNECTION__.readline()
-

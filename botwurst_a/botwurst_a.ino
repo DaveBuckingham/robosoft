@@ -38,9 +38,10 @@
 //           VARIABLES              //
 //////////////////////////////////////
 
-byte pin_index;
 char pin_type;
 char buffer[16];
+byte pin_index;
+byte pin_value;
 
 
 //////////////////////////////////////
@@ -69,23 +70,23 @@ void loop() {
     //     GET PIN TYPE     //
     //////////////////////////
     if (! Serial.available()) {
-        continue;
+        return;
     }
     pin_type = Serial.read();
     if (pin_type != 'a' && pin_type != 'd') {
         Serial.print("Invalid pin type.\n");
-        continue;
+        return;
     }
     delay(SERIAL_DELAY);  // WAIT FOR PIN INDEX AND VALUE
 
     if (! Serial.available()) {
-        continue;
+        return;
     }
 
     pin_index = Serial.read();
 
     if (! Serial.available()) {
-        continue;
+        return;
     }
 
     //////////////////////////
@@ -96,14 +97,14 @@ void loop() {
         // CHECK INDEX BOUNDS
         if (pin_index < 0 || pin_index >= NUM_ANALOG_PINS) {
             Serial.print("Index out of range.\n");
-            continue;
+            return;
         }
 
         // READ PIN VALUE
         pin_value = Serial.read();
         if (pin_value < 0 || pin_value > ANALOG_HI) {
             Serial.print("Pin value out of range.\n");
-            continue;
+            return;
         }
 
         // WRITE TO PIN  (COULD USE ARRAY)
@@ -123,14 +124,14 @@ void loop() {
         // CHECK INDEX BOUNDS
         if (pin_index < 0 || pin_index >= NUM_DIGITAL_PINS) {
             Serial.print("Index out of range.\n");
-            continue;
+            return;
         }
 
         // READ PIN VALUE
         pin_value = Serial.read();
         if (pin_value < 0 || pin_value > 1) {
             Serial.print("Pin value out of range.\n");
-            continue;
+            return;
         }
 
         // WRITE TO PIN
