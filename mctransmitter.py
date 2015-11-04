@@ -68,3 +68,6 @@ class mctransmitter:
         packed = struct.pack('!cBB', 'a', pin_index, value)
         mctransmitter.__CONNECTION__.write(packed)
         return mctransmitter.__CONNECTION__.readline()
+
+
+print mctransmitter.tx_analog(0, 200)

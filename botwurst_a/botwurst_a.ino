@@ -31,7 +31,7 @@
 #define ANALOG_PIN_0 10
 #define ANALOG_PIN_1 9
 
-#define DIGITAL_PIN_0 13
+#define DIGITAL_PIN_0 8
 #define DIGITAL_PIN_1 12 
 
 #define NUM_DIGITAL_PINS 2
