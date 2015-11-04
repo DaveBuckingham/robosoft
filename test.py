@@ -1,9 +1,23 @@
+import mctransmitter
 import time
-import mctransmitter.py
 
-i=0
-while(True):
-    mctransmitter.tx_analog(0, i % 255)
-    mctransmitter.tx_analog(1, 255 - (i % 255))
-    i = i + 5
-    time.sleep(.01)
+delay = 0.05
+
+mctransmitter.initialize()
+while (True):
+    mctransmitter.tx_analog(0, 255)
+    time.sleep(delay)
+    mctransmitter.tx_analog(0, 0)
+
+    mctransmitter.tx_analog(1, 255)
+    time.sleep(delay)
+    mctransmitter.tx_analog(1, 0)
+
+    mctransmitter.tx_digital(0, 1)
+    time.sleep(delay)
+    mctransmitter.tx_digital(0, 0)
+
+    #mctransmitter.tx_digital(1, 1)
+    #time.sleep(delay)
+    #mctransmitter.tx_digital(1, 0)
+

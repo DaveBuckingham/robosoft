@@ -8,71 +8,61 @@ import time
 import serial
 import struct
 
-class mctransmitter:
 
-    __CONNECTION__ = None
-
-
-    ##############################
-    #     INITIALIZE COM         #
-    ##############################
-
-    # INITIALIZE SERIAL CONNECTION
-    # CALLED AUTOMATICALLY ON FIRST
-    # CALL TO tx_digital() or tx_analog()
-    @staticmethod
-    def initialize():
-        mctransmitter.__CONNECTION__ = serial.Serial(
-            #port='/dev/serial/by-id/AAAAA',
-            port='/dev/ttyACM0',
-            baudrate=9600,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS
-        )
-        return mctransmitter.__CONNECTION__.readline()
+CONNECTION = None
 
 
-    ##############################
-    #          CLSOE COM         #
-    ##############################
+##############################
+#     INITIALIZE COM         #
+##############################
 
-    # PROBABLY NEVER NEED TO CALL THIS
-    @staticmethod
-    def close():
-        __CONNECTION__.close
-
-
-    ##############################
-    #         TRANSMIT           #
-    ##############################
-
-    # DIGITAL COMMAND
-    # 2 DIGITAL PINS SO pin_index IN [0,1]
-    # BINARY STATE SO value IN [True, False]
-    @staticmethod
-    def tx_digital(pin_index, value):
-        if (mctransmitter.__CONNECTION__ == None):
-            mctransmitter.initialize()
-        packed = struct.pack('!cB?', 'd', pin_index, value)
-        mctransmitter.__CONNECTION__.write(packed)
-        return mctransmitter.__CONNECTION__.readline()
-
-    # ANALOG COMMAND
-    # 2 ANALOG PINS SO pin_index IN [0,1]
-    # value IN [0, 255]
-    @staticmethod
-    def tx_analog(pin_index, value):
-        if (mctransmitter.__CONNECTION__ == None):
-            mctransmitter.initialize()
-        packed = struct.pack('!cBB', 'a', pin_index, value)
-        mctransmitter.__CONNECTION__.write(packed)
-        return mctransmitter.__CONNECTION__.readline()
+# INITIALIZE SERIAL CONNECTION
+# CALLED AUTOMATICALLY ON FIRST
+# CALL TO tx_digital() or tx_analog()
+def initialize():
+    global CONNECTION
+    CONNECTION = serial.Serial(
+        #port='/dev/serial/by-id/AAAAA',
+        port='/dev/ttyACM0',
+        baudrate=9600,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+        bytesize=serial.EIGHTBITS
+    )
+    return CONNECTION.readline()
 
 
-i=0
-while(True):
-    mctransmitter.tx_analog(0, i % 255)
-    mctransmitter.tx_analog(1, 255 - (i % 255))
-    i = i + 5
-    time.sleep(.01)
+##############################
+#          CLSOE COM         #
+##############################
+
+# PROBABLY NEVER NEED TO CALL THIS
+def close():
+    CONNECTION.close
+
+
+##############################
+#         TRANSMIT           #
+##############################
+
+# DIGITAL COMMAND
+# 2 DIGITAL PINS SO pin_index IN [0,1]
+# BINARY STATE SO value IN [True, False]
+def tx_digital(pin_index, value):
+    if (CONNECTION == None):
+        initialize()
+    packed = struct.pack('!cB?', 'd', pin_index, value)
+    CONNECTION.write(packed)
+    return CONNECTION.readline()
+
+# ANALOG COMMAND
+# 2 ANALOG PINS SO pin_index IN [0,1]
+# value IN [0, 255]
+def tx_analog(pin_index, value):
+    if (CONNECTION == None):
+        initialize()
+    packed = struct.pack('!cBB', 'a', pin_index, value)
+    CONNECTION.write(packed)
+    return CONNECTION.readline()
+
+

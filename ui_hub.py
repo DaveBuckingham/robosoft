@@ -8,10 +8,10 @@ float, float, bool, bool '''
 import subprocess
 import os
 
-import mctransmitter.py  # COM WITH ARDUINO
-import global_data.py    # SHARED WITH ui_display AND ui_map
-import ui_map.py         # MAP BUTTON EVENTS TO PIN COMMANDS
-import ui_display.py     # VISUAL DISPLAY
+import mctransmitter  # COM WITH ARDUINO
+import global_data    # SHARED WITH ui_display AND ui_map
+import ui_map         # MAP BUTTON EVENTS TO PIN COMMANDS
+import ui_display     # VISUAL DISPLAY
 
 
 # PASS BUTTON VALUES THROUGH THESE
