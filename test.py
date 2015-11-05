@@ -5,7 +5,6 @@
 #   - botwurst.ino
 #   - led circuit
 
-import mctransmitter
 import ui_display
 import global_data
 import ui_map
@@ -14,7 +13,6 @@ import time
 delay = 0.1
 
 map = ui_map.simple_map()
-mctransmitter.initialize()
 
 i = 0
 j = 0
