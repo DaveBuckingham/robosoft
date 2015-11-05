@@ -19,11 +19,11 @@ def __bar__(val):
        else:
            return "%3s  " % 'F' + "."*length
    else:
-       full = (length * val) / ANALOG_MAX
+       full = (length * val) / global_data.ANALOG_MAX
        return "%3d  " % val + ("|" * full) + ("." * (length - full))
 
 # UPDATE DISPLAY
-def display():
+def update():
 
     # CLEAR SCREEN
     if (os.name == 'posix'):
@@ -56,26 +56,26 @@ A   -> Hold for Motor 2
     FORMAT = "%-12s %-30s %-34s %-20s"
 
     print FORMAT % ("analog_0",
-        ui_display.__bar__(global_data.analog_0),
-        ui_display.__bar__(global_data.analog_0_confirmed),
+        __bar__(global_data.analog_0),
+        __bar__(global_data.analog_0_confirmed),
         mode_text[0])
     print FORMAT % ("", "", "", mode_text[1])
 
     print FORMAT % ("analog_1",
-        ui_display.__bar__(global_data.analog_1),
-        ui_display.__bar__(global_data.analog_1_confirmed),
+        __bar__(global_data.analog_1),
+        __bar__(global_data.analog_1_confirmed),
         mode_text[2])
     print FORMAT % ("", "", "", mode_text[3])
 
     print FORMAT % ("digital_0",
-        ui_display.__bar__(global_data.digital_0),
-        ui_display.__bar__(global_data.digital_0_confirmed),
+        __bar__(global_data.digital_0),
+        __bar__(global_data.digital_0_confirmed),
         mode_text[4])
     print FORMAT % ("", "", "", mode_text[5])
 
     print FORMAT % ("digital_1",
-        ui_display.__bar__(global_data.digital_1),
-        ui_display.__bar__(global_data.digital_1_confirmed),
+        __bar__(global_data.digital_1),
+        __bar__(global_data.digital_1_confirmed),
         mode_text[6])
     print FORMAT % ("", "", "", mode_text[7])
 

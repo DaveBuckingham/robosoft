@@ -15,20 +15,19 @@ digital_1_confirmed = False;
 
 
 
--# (I'M JUST MAKING THIS UP, WE'LL HAVE TO CHANGE IT! -db)
--# BUTTON NAMES
-BUTTON_X = 'button_2'
-BUTTON_Y = 'button_3'
-BUTTON_A = 'button_0'
-BUTTON_B = 'button_1'
+# BUTTON NAMES
+BUTTON_X             = 'button_2'
+BUTTON_Y             = 'button_3'
+BUTTON_A             = 'button_0'
+BUTTON_B             = 'button_1'
 
-BUTTON_SELECT = 'button_6'
-BUTTON_START = 'button_7'
-BUTTON_LEFT_STICK = 'button_8'
-BUTTON_RIGHT_STICK = 'button_9'
+BUTTON_SELECT        = 'button_6'
+BUTTON_START         = 'button_7'
+BUTTON_LEFT_STICK    = 'button_8'
+BUTTON_RIGHT_STICK   = 'button_9'
 
-AXIS_X_LEFT_STICK   = 'axis_0'
-AXIS_Y_LEFT_STICK   = 'axis_1'
-AXIS_TRIGGERS = 'axis_2"
+AXIS_X_LEFT_STICK    = 'axis_0'
+AXIS_Y_LEFT_STICK    = 'axis_1'
+AXIS_TRIGGERS        = 'axis_2'
 AXIS_X_RIGHT_STICK   = 'axis_3'
 AXIS_Y_RIGHT_STICK   = 'axis_4'
