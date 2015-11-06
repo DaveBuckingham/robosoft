@@ -68,8 +68,10 @@ for line in iter(proc.stdout.readline,''):
                     axis_states[button_index] = 0
                     ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
             else:
-                axis_states[button_index] = button_value
-                ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
+                if (abs(button_value - axis_states[button_index]) > 10):
+                    axis_states[button_index] = button_value
+                    ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
+                    #print button_value
         else:
             ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
         
