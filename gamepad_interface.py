@@ -117,8 +117,8 @@ else:
 exit = False
 
 #axis 0 value area threshold
-0_THRESHOLD = 0.01
-axis_states[, prev_state = 0]
+#0_THRESHOLD = 0.01
+#axis_states[, prev_state = 0]
 
 while gamepad_count and exit == False:
 #    check_pad()
@@ -128,8 +128,8 @@ while gamepad_count and exit == False:
         if event.type == pygame.JOYBUTTONUP:
             print '{} button_{} {}'.format(event.joy, event.button, 0)
         if event.type == pygame.JOYAXISMOTION:
-          if (abs(event.value) < 0_THRESHOLD):
-            if (axis_states[
+#          if (abs(event.value) < 0_THRESHOLD):
+#            if (axis_states[
             print '{} axis_{} {}'.format(event.joy, event.axis, event.value)
         if event.type == pygame.JOYHATMOTION:
             print '{} dpad_{} {}'.format(event.joy, event.hat, event.value)
