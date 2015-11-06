@@ -3,6 +3,19 @@ q or esc terminates ui_hub.
 switch from subprocess to subprocess32
 or make gamepad_interface into a module instead of subprocess
 
+handle dpad
 
+wireless laptop -> arduino
+
+wireless gamepad -> laptop
+
+graphical display
+
+MAKE IT ARCHITECTURE INDEPENDENT
+i think the only architecture dependent code is in the
+initialize() function in mctransmitter.py where we address
+the serial connection.
+
+mctransmitter should send confirmation data to global_data
 
 

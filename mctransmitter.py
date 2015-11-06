@@ -1,15 +1,21 @@
-# MOTOR COMMAND TRANSMITTER
-# DAVID BUCKINGHAM
 #
-# Transmittes the received motor command 4-tuple
-# to a receiver on the microcontroller.
+# TRANSMITS COMMANDS TO THE ARDUINO OVER SERIAL
+#
 
 import sys
 import time
 import serial
 import struct
+import global_data
 
 
+# SET TO FALSE FOR TESTING WITHOUT ARDUINO
+TRANSMIT = False
+
+# WAIT FOR RESPONSE AFTER EACH TX
+RECEIVE = False
+
+# THIS WILL GET ASSIGNED DURING INITIALIZATION
 CONNECTION = None
 
 
@@ -23,7 +29,8 @@ CONNECTION = None
 def initialize():
     global CONNECTION
     CONNECTION = serial.Serial(
-        #port='/dev/serial/by-id/AAAAA',
+        # WHAT SHOULD THIS BE FOR WINDOWS? MAC?
+        # SHOULD DETECT OS AND ASSIGNN THIS ACCORDINGLY
         port='/dev/ttyACM0',
         baudrate=9600,
         parity=serial.PARITY_NONE,
@@ -46,28 +53,52 @@ def close():
 #         TRANSMIT           #
 ##############################
 
-# DIGITAL COMMAND
+# DIGITAL TX
 # 2 DIGITAL PINS SO pin_index IN [0,1]
 # BINARY STATE SO value IN [True, False]
 def tx_digital(pin_index, value):
     if (not isinstance(value, bool)):
         sys.exit("Non-boolean value arg to tx_digital")
-    if (CONNECTION == None):
+    if (TRANSMIT and (CONNECTION == None)):
         initialize()
     packed = struct.pack('!cB?', 'd', pin_index, value)
-    CONNECTION.write(packed)
-    return CONNECTION.readline()
+    if (TRANSMIT):
+        CONNECTION.write(packed)
+    if (pin_index == 0):
+        global_data.digital_0_sent = value
+    elif (pin_index == 1):
+        global_data.digital_1_sent = value
+    receive()
+        
 
-# ANALOG COMMAND
+# ANALOG TX
 # 2 ANALOG PINS SO pin_index IN [0,1]
 # value IN [0, 255]
 def tx_analog(pin_index, value):
     if (not isinstance(value, int)):
-        sys.exit("Non-int value arg to tx_digital")
-    if (CONNECTION == None):
+        sys.exit("Non-int value arg to tx_digital: {}".format(value))
+    if (TRANSMIT and (CONNECTION == None)):
         initialize()
     packed = struct.pack('!cBB', 'a', pin_index, value)
-    CONNECTION.write(packed)
-    return CONNECTION.readline()
+    if (TRANSMIT):
+        CONNECTION.write(packed)
+    if (pin_index == 0):
+        global_data.analog_0_sent = value
+    elif (pin_index == 1):
+        global_data.analog_1_sent = value
+    receive()
+
+
+
+##############################
+#          RECEIVE           #
+##############################
+
+# READ RESPONSE FROM ARDUINO AND
+# SET VARIABLES IN global_data.py
+
+def receive():
+    if (RECEIVE):
+        CONNECTION.readline()
 
 

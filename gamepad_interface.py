@@ -18,6 +18,8 @@ gamepad_id# axis/button_id# value
     -Joysticks
 
 
+*** CONSULT global_data.py FOR UPDATED DEFINITIONS -db ***
+
 OUTPUT BUTTON/AXIS ID NUMBERS:
     button_0 = A
     button_1 = B
@@ -124,15 +126,19 @@ while gamepad_count and exit == False:
 #    check_pad()
     for event in pygame.event.get():
         if event.type == pygame.JOYBUTTONDOWN:
-            print '{} button_{} {}'.format(event.joy, event.button, 1)
+            #print '{} button_{} {}'.format(event.joy, event.button, 1)
+            print '{} b {} {}'.format(event.joy, event.button, 1)  # -db
         if event.type == pygame.JOYBUTTONUP:
-            print '{} button_{} {}'.format(event.joy, event.button, 0)
+            #print '{} button_{} {}'.format(event.joy, event.button, 0)
+            print '{} b {} {}'.format(event.joy, event.button, 0)  # -db
         if event.type == pygame.JOYAXISMOTION:
 #          if (abs(event.value) < 0_THRESHOLD):
 #            if (axis_states[
-            print '{} axis_{} {}'.format(event.joy, event.axis, event.value)
+            #print '{} axis_{} {}'.format(event.joy, event.axis, event.value)
+            print '{} a {} {}'.format(event.joy, event.axis, event.value)  # -db
         if event.type == pygame.JOYHATMOTION:
-            print '{} dpad_{} {}'.format(event.joy, event.hat, event.value)
+            #print '{} dpad_{} {}'.format(event.joy, event.hat, event.value)
+            print '{} d {} {}'.format(event.joy, event.hat, event.value)  # -db
 #included to stop the program during testing
 #        if event.type == pygame.JOYBUTTONDOWN and event.button == 0:
 #            exit = True

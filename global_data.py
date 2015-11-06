@@ -1,10 +1,10 @@
 ANALOG_MAX = 255
 
 # COMMANDS SENT TO ARDUINO
-analog_0  = 0;
-analog_1  = 0;
-digital_0 = False;
-digital_1 = False;
+analog_0_sent  = 0;
+analog_1_sent  = 0;
+digital_0_sent = False;
+digital_1_sent = False;
 
 # (CURRENLTY, NOTHING WRITES TO THIS -db)
 # RESPONSE RECIEVED FROM ARDUINO
@@ -13,25 +13,30 @@ analog_1_confirmed  = 0;
 digital_0_confirmed = False;
 digital_1_confirmed = False;
 
-
+# BUTTON TYPES
+TYPE_BUTTON          = 'b'  # VALUE WILL BE 0 OR 1
+TYPE_AXIS            = 'a'  # VALUE WILL BE BETWEEN 0 AND 1
+TYPE_DPAD            = 'd'  # VALUE WILL BE PAIR OF -1, 0, OR 1
 
 # BUTTON NAMES
-BUTTON_X             = 'button_2'
-BUTTON_Y             = 'button_3'
-BUTTON_A             = 'button_0'
-BUTTON_B             = 'button_1'
+BUTTON_X             = 2
+BUTTON_Y             = 3
+BUTTON_A             = 0
+BUTTON_B             = 1
 
-BUTTON_SELECT        = 'button_6'
-BUTTON_START         = 'button_7'
-BUTTON_LEFT_STICK    = 'button_8'
-BUTTON_RIGHT_STICK   = 'button_9'
+BUTTON_SELECT        = 6
+BUTTON_START         = 7
+BUTTON_LEFT_STICK    = 8
+BUTTON_RIGHT_STICK   = 9
 
-AXIS_X_LEFT_STICK    = 'axis_0'
-AXIS_Y_LEFT_STICK    = 'axis_1'
-AXIS_TRIGGERS        = 'axis_2'
-AXIS_X_RIGHT_STICK   = 'axis_3'
-AXIS_Y_RIGHT_STICK   = 'axis_4'
+AXIS_X_LEFT_STICK    = 0
+AXIS_Y_LEFT_STICK    = 1
+AXIS_TRIGGERS        = 2
+AXIS_X_RIGHT_STICK   = 3
+AXIS_Y_RIGHT_STICK   = 4
 
 
+# INDEX TO THE CURRENT CONTROL MAP
+# ARRAY DEFINED IN ui_map.py
 map_index = 0
 
