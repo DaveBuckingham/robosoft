@@ -1,3 +1,6 @@
+#!/usr/bin/python
+
+
 __author__ = 'Jeanne-Marie'
 ''' Runs gamepad_interface.py as a subprocess.
 Reads output from gamepad_interface.py and maps it to 4-tuples.
@@ -23,24 +26,26 @@ def scale_digital(val):  # [anything] -> [False, True]
     return (val > 0)
 
 
-# WHEN WE GET A BUTTON EVENT FROM gampad_interface() CHECK
-# IF ITS THE 'SELECT' BUTTON. IF SO, INCREMENT TO NEXT MAP
-# IN THIS LIST. OTHERWISE, PASS IT TO THE CURRENT MAP.
-map_list = [ui_map.simple_map(), ui_map.toggle_map()]
 
 
+ui_display.update()
 
-# TODO python documentation suggests using subprocess32
 
 # based on http://stackoverflow.com/questions/2804543/read-subprocess-stdout-line-by-line
-def gamepad_to_motor_command_transmitter(whatever_would_be_input_to_gamepad_subprocess):
-    proc = subprocess.Popen(['python', '-u', 'game_interface.py'], stdout=subprocess.PIPE)
 
-    for line in iter(proc.stdout.readline,''):
-        #parse line to get variables
-        speed = 0
-        wavelength = 0
-        left = False
-        right = False
+proc = subprocess.Popen(['python', '-u', './gamepad_interface.py'], stdout=subprocess.PIPE)
+for line in iter(proc.stdout.readline,''):
+    line = line.rstrip()  # REMOVE NEWLINE
+    strings = line.split(" ")
+    gamepad_index = int(strings[0])
+    button = strings[1]
+    value = int(strings[0])
 
-        mctransmitter.send_motor_command(speed, wavelength, left, right)
+
+    if (button == global_data.BUTTON_SELECT and value == True):
+        global_data.map_index = (global_data.map_index + 1) % len(ui_map.map_list)
+    else:
+        ui_map.map_list[global_data.map_index].update(button, value)
+
+    ui_display.update()
+

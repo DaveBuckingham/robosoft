@@ -1,6 +1,7 @@
 
 import os
 import global_data
+import ui_map
 
 
 
@@ -32,15 +33,7 @@ def update():
         # NOT SURE ABOUT WINDOWS
         os.system('clear') 
 
-    # FOR TESTING
-    mode_description = """DAVE'S AWESOME CONTROL MODE:
-
-L2  -> Wavelength
-R2  -> Frequency
-X   -> Toggle Motor 1
-A   -> Hold for Motor 2
-"""
-    mode_text = mode_description.split('\n')
+    mode_text = ui_map.map_list[global_data.map_index].description.split('\n')
 
     # FOR REAL
     #mode_text = mode.description.split('\n')

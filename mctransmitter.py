@@ -4,6 +4,7 @@
 # Transmittes the received motor command 4-tuple
 # to a receiver on the microcontroller.
 
+import sys
 import time
 import serial
 import struct
@@ -49,6 +50,8 @@ def close():
 # 2 DIGITAL PINS SO pin_index IN [0,1]
 # BINARY STATE SO value IN [True, False]
 def tx_digital(pin_index, value):
+    if (not isinstance(value, bool)):
+        sys.exit("Non-boolean value arg to tx_digital")
     if (CONNECTION == None):
         initialize()
     packed = struct.pack('!cB?', 'd', pin_index, value)
@@ -59,6 +62,8 @@ def tx_digital(pin_index, value):
 # 2 ANALOG PINS SO pin_index IN [0,1]
 # value IN [0, 255]
 def tx_analog(pin_index, value):
+    if (not isinstance(value, int)):
+        sys.exit("Non-int value arg to tx_digital")
     if (CONNECTION == None):
         initialize()
     packed = struct.pack('!cBB', 'a', pin_index, value)

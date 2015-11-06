@@ -61,7 +61,4 @@ R2  -> Frequency"""
  
 
 
-
-
-
-
+map_list = [simple_map(), toggle_map()]

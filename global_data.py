@@ -31,3 +31,7 @@ AXIS_Y_LEFT_STICK    = 'axis_1'
 AXIS_TRIGGERS        = 'axis_2'
 AXIS_X_RIGHT_STICK   = 'axis_3'
 AXIS_Y_RIGHT_STICK   = 'axis_4'
+
+
+map_index = 0
+
