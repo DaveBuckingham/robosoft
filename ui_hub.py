@@ -24,6 +24,10 @@ def scale_analog(val):   # [-1,1] -> [0,255]
 def scale_digital(val):  # [anything] -> [False, True]
     return (val > 0)
 
+THRESHOLD = 0.09
+
+axis_states = [0, 0, 0, 0, 0, 0]
+
 
 # INITIALIZE THE DISPLAY
 ui_display.update()
@@ -57,7 +61,17 @@ for line in iter(proc.stdout.readline,''):
     if (button_type == global_data.TYPE_BUTTON and button_index == global_data.BUTTON_SELECT and button_value):
         global_data.map_index = (global_data.map_index + 1) % len(ui_map.map_list)
     else:
-        ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
+
+        if (button_type == global_data.TYPE_AXIS):
+            if (abs(button_value) < THRESHOLD):
+                if (axis_states[button_index] != 0):
+                    axis_states[button_index] = 0
+                    ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
+            else:
+                axis_states[button_index] = button_value
+                ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
+        else:
+            ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
         
     # REFRESH
     ui_display.update()
