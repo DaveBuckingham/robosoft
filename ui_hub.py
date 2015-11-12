@@ -29,8 +29,9 @@ THRESHOLD = 0.09
 axis_states = [0, 0, 0, 0, 0, 0]
 
 
-# INITIALIZE THE DISPLAY
+# INITIALIZE
 ui_display.update()
+mctransmitter.initialize()
 
 
 # ITERATE OVER gamepad_interface.py OUTPUT

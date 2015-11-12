@@ -43,7 +43,7 @@
 //////////////////////////////////////
 
 char pin_type;
-char buffer[16];
+//char buffer[16];
 byte pin_index;
 byte pin_value;
 
@@ -52,7 +52,8 @@ byte pin_value;
 //           INTIIALIZE             //
 //////////////////////////////////////
 
-void setup() {
+
+void initialize_txrx() {
     Serial.begin(BAUD);
 
     pinMode(ANALOG_PIN_0, OUTPUT);
@@ -63,12 +64,21 @@ void setup() {
     Serial.println("botwurst_a ready...");
 }
 
+void initialize_processing() {
+    ;
+}
+
+void setup() {
+    initialize_txrx();
+    initialize_processing();
+}
+
 
 //////////////////////////////////////
 //           MAIN LOOP              //
 //////////////////////////////////////
 
-void loop() {
+void txrx() {
 
     //////////////////////////
     //     GET PIN TYPE     //
@@ -150,10 +160,19 @@ void loop() {
     //////////////////////////
     //   SEND CONFIRMATION  //
     //////////////////////////
-    sprintf(buffer, "%u %u\n", pin_index, pin_value);
-    Serial.print(buffer);
+    //sprintf(buffer, "%u %u\n", pin_index, pin_value);
+    //Serial.print(buffer);
 
     // delay(LOOP_DELAY);  // IS THIS NEEDED?
+}
+
+void processing() {
+    ;
+}
+
+void loop() {
+    txrx();
+    processing();
 }
 
 

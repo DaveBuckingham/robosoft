@@ -59,8 +59,6 @@ def close():
 def tx_digital(pin_index, value):
     if (not isinstance(value, bool)):
         sys.exit("Non-boolean value arg to tx_digital")
-    if (TRANSMIT and (CONNECTION == None)):
-        initialize()
     packed = struct.pack('!cB?', 'd', pin_index, value)
     if (TRANSMIT):
         CONNECTION.write(packed)
@@ -68,7 +66,7 @@ def tx_digital(pin_index, value):
         global_data.digital_0_sent = value
     elif (pin_index == 1):
         global_data.digital_1_sent = value
-    receive()
+    #receive()
         
 
 # ANALOG TX
@@ -77,8 +75,6 @@ def tx_digital(pin_index, value):
 def tx_analog(pin_index, value):
     if (not isinstance(value, int)):
         sys.exit("Non-int value arg to tx_digital: {}".format(value))
-    if (TRANSMIT and (CONNECTION == None)):
-        initialize()
     packed = struct.pack('!cBB', 'a', pin_index, value)
     if (TRANSMIT):
         CONNECTION.write(packed)
@@ -86,7 +82,7 @@ def tx_analog(pin_index, value):
         global_data.analog_0_sent = value
     elif (pin_index == 1):
         global_data.analog_1_sent = value
-    receive()
+    #receive()
 
 
 
@@ -97,8 +93,8 @@ def tx_analog(pin_index, value):
 # READ RESPONSE FROM ARDUINO AND
 # SET VARIABLES IN global_data.py
 
-def receive():
-    if (RECEIVE):
-        CONNECTION.readline()
+#def receive():
+#    if (RECEIVE):
+#        CONNECTION.readline()
 
 
