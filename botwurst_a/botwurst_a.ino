@@ -15,70 +15,94 @@
 //            CONSTANTS             //
 //////////////////////////////////////
 
-// SERIAL COMMUNICATION
-#define LOOP_DELAY 10     // MILLISECONDS
+#define ANALOG_HI     255
+
+// SERIAL COM
 #define SERIAL_DELAY 100  // MILLISECONDS
 #define BAUD 9600
 #define SERIAL_CONFIG SERIAL_8N1
 
-#define ANALOG_HI     255
+#define NUM_DIGITAL_VALS 2
+#define NUM_ANALOG_VALS 2
 
-//The analog input pins on the Mega are A0-A5
-#define ANALOG_INPUT_0  A0
-#define ANALOG_INPUT_1  A1
-
-//The digital pins on the Mega can also act as analog output
+// *** PIERS: YOU MAY WANT TO CHANGE THESE *** //
 #define ANALOG_PIN_0 10
 #define ANALOG_PIN_1 9
-
 #define DIGITAL_PIN_0 6
 #define DIGITAL_PIN_1 5 
 
-#define NUM_DIGITAL_PINS 2
-#define NUM_ANALOG_PINS 2
 
 
 //////////////////////////////////////
 //           VARIABLES              //
 //////////////////////////////////////
 
-char pin_type;
-//char buffer[16];
-byte pin_index;
-byte pin_value;
+// STORAGE FOR DATA READ FROM SERIAL COM
+char cmd_type;
+byte cmd_index;
+byte cmd_value;
+
+// STATE
+byte digital_val_0;   // [0..1]
+byte digital_val_1;   // [0..1]
+byte analog_val_0;    // [0..255]
+byte analog_val_1;    // [0..255]
 
 
 //////////////////////////////////////
 //           INTIIALIZE             //
 //////////////////////////////////////
 
-
-void initialize_txrx() {
+void setup() {
+    // INTIALIZE SERIAL COM
     Serial.begin(BAUD);
-
+    
+    // *** PIERS: YOU MIGHT PUT INITIALIZATIN CODE HERE *** //
+    // INITIALIZE COMPUTATION AND GPIO
     pinMode(ANALOG_PIN_0, OUTPUT);
     pinMode(ANALOG_PIN_1, OUTPUT);
     pinMode(DIGITAL_PIN_0, OUTPUT);
     pinMode(DIGITAL_PIN_1, OUTPUT);
 
-    Serial.println("botwurst_a ready...");
-}
-
-void initialize_processing() {
-    ;
-}
-
-void setup() {
-    initialize_txrx();
-    initialize_processing();
+    //Serial.println("botwurst_a ready...");
 }
 
 
 //////////////////////////////////////
-//           MAIN LOOP              //
+//          COMPUTE                 //
 //////////////////////////////////////
 
-void txrx() {
+// *** PIERS: YOU MIGHT WANT TO PUT YOUR COMPUTATION HERE *** //
+// *** THIS WILL GET CALLED EVERY TIME TIME A NEW COMMAND IS RECEIVED *** //
+void compute() {
+
+    // ANALOG
+    if (cmd_type == 'a') {
+        if (cmd_index == 0) {
+            analogWrite(ANALOG_PIN_0, analog_val_0);
+        }
+        else if (cmd_index == 1) {
+            analogWrite(ANALOG_PIN_1, analog_val_1);
+        }
+    }
+
+    // DIGITAL
+    else {  // cmd_type == 'd'
+        if (cmd_index == 0) {
+            digitalWrite(DIGITAL_PIN_0, digital_val_0);
+        }
+        else if (cmd_index == 1) {
+            digitalWrite(DIGITAL_PIN_1, digital_val_1);
+        }
+    }
+}
+
+
+//////////////////////////////////////
+//       MAIN LOOP / TXRX           //
+//////////////////////////////////////
+
+void loop() {
 
     //////////////////////////
     //     GET PIN TYPE     //
@@ -86,18 +110,18 @@ void txrx() {
     if (! Serial.available()) {
         return;
     }
-    pin_type = Serial.read();
-    if (pin_type != 'a' && pin_type != 'd') {
-        Serial.print("Invalid pin type.\n");
+    cmd_type = Serial.read();
+    if (cmd_type != 'a' && cmd_type != 'd') {
+        Serial.print("Invalid cmd type.\n");
         return;
     }
-    delay(SERIAL_DELAY);  // WAIT FOR PIN INDEX AND VALUE
+    delay(SERIAL_DELAY);  // WAIT FOR REST OF DATA
 
     if (! Serial.available()) {
         return;
     }
 
-    pin_index = Serial.read();
+    cmd_index = Serial.read();
 
     if (! Serial.available()) {
         return;
@@ -106,27 +130,24 @@ void txrx() {
     //////////////////////////
     //    ANALOG PIN        //
     //////////////////////////
-    if (pin_type == 'a') {
+    if (cmd_type == 'a') {
 
         // CHECK INDEX BOUNDS
-        if (pin_index < 0 || pin_index >= NUM_ANALOG_PINS) {
+        if (cmd_index < 0 || cmd_index >= NUM_ANALOG_VALS) {
             Serial.print("Index out of range.\n");
             return;
         }
 
-        // READ PIN VALUE
-        pin_value = Serial.read();
-        if (pin_value < 0 || pin_value > ANALOG_HI) {
-            Serial.print("Pin value out of range.\n");
+        // READ CMD VALUE
+        cmd_value = Serial.read();
+        if (cmd_value < 0 || cmd_value > ANALOG_HI) {
+            Serial.print("cmd value out of range.\n");
             return;
         }
 
-        // WRITE TO PIN  (COULD USE ARRAY)
-        if (pin_index == 0) {
-            analogWrite(ANALOG_PIN_0, pin_value);
-        }
-        else if (pin_index == 1) {
-            analogWrite(ANALOG_PIN_1, pin_value);
+        // COMPUTE
+        else {
+            compute();
         }
     }
 
@@ -136,43 +157,23 @@ void txrx() {
     else {  // pin_type == 'd'
 
         // CHECK INDEX BOUNDS
-        if (pin_index < 0 || pin_index >= NUM_DIGITAL_PINS) {
+        if (cmd_index < 0 || cmd_index >= NUM_DIGITAL_VALS) {
             Serial.print("Index out of range.\n");
             return;
         }
 
-        // READ PIN VALUE
-        pin_value = Serial.read();
-        if (pin_value < 0 || pin_value > 1) {
-            Serial.print("Pin value out of range.\n");
+        // READ CMD VALUE
+        cmd_value = Serial.read();
+        if (cmd_value < 0 || cmd_value > 1) {
+            Serial.print("cmd value out of range.\n");
             return;
         }
 
-        // WRITE TO PIN
-        if (pin_index == 0) {
-            digitalWrite(DIGITAL_PIN_0, pin_value);
-        }
-        else if (pin_index == 1) {
-            digitalWrite(DIGITAL_PIN_1, pin_value);
+        // COMPUTE
+        else {
+            compute();
         }
     }
-
-    //////////////////////////
-    //   SEND CONFIRMATION  //
-    //////////////////////////
-    //sprintf(buffer, "%u %u\n", pin_index, pin_value);
-    //Serial.print(buffer);
-
-    // delay(LOOP_DELAY);  // IS THIS NEEDED?
-}
-
-void processing() {
-    ;
-}
-
-void loop() {
-    txrx();
-    processing();
 }
 
 
