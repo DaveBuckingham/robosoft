@@ -43,10 +43,10 @@ byte cmd_index;
 byte cmd_value;
 
 // STATE
-byte digital_val_0;   // [0..1]
-byte digital_val_1;   // [0..1]
-byte analog_val_0;    // [0..255]
-byte analog_val_1;    // [0..255]
+//byte digital_val_0;   // [0..1]
+//byte digital_val_1;   // [0..1]
+//byte analog_val_0;    // [0..255]
+//byte analog_val_1;    // [0..255]
 
 
 //////////////////////////////////////
@@ -79,20 +79,20 @@ void compute() {
     // ANALOG
     if (cmd_type == 'a') {
         if (cmd_index == 0) {
-            analogWrite(ANALOG_PIN_0, analog_val_0);
+            analogWrite(ANALOG_PIN_0, cmd_value);
         }
         else if (cmd_index == 1) {
-            analogWrite(ANALOG_PIN_1, analog_val_1);
+            analogWrite(ANALOG_PIN_1, cmd_value);
         }
     }
 
     // DIGITAL
     else {  // cmd_type == 'd'
         if (cmd_index == 0) {
-            digitalWrite(DIGITAL_PIN_0, digital_val_0);
+            digitalWrite(DIGITAL_PIN_0, cmd_value);
         }
         else if (cmd_index == 1) {
-            digitalWrite(DIGITAL_PIN_1, digital_val_1);
+            digitalWrite(DIGITAL_PIN_1, cmd_value);
         }
     }
 }
@@ -127,6 +127,8 @@ void loop() {
         return;
     }
 
+    cmd_value = Serial.read();
+
     //////////////////////////
     //    ANALOG PIN        //
     //////////////////////////
@@ -139,7 +141,6 @@ void loop() {
         }
 
         // READ CMD VALUE
-        cmd_value = Serial.read();
         if (cmd_value < 0 || cmd_value > ANALOG_HI) {
             Serial.print("cmd value out of range.\n");
             return;
@@ -154,8 +155,7 @@ void loop() {
     //////////////////////////
     //    DIGITIAL PIN      //
     //////////////////////////
-    else {  // pin_type == 'd'
-
+    else if (cmd_type == 'd') {
         // CHECK INDEX BOUNDS
         if (cmd_index < 0 || cmd_index >= NUM_DIGITAL_VALS) {
             Serial.print("Index out of range.\n");
@@ -163,7 +163,6 @@ void loop() {
         }
 
         // READ CMD VALUE
-        cmd_value = Serial.read();
         if (cmd_value < 0 || cmd_value > 1) {
             Serial.print("cmd value out of range.\n");
             return;

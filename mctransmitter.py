@@ -12,9 +12,6 @@ import global_data
 # SET TO FALSE FOR TESTING WITHOUT ARDUINO
 TRANSMIT = True
 
-# WAIT FOR RESPONSE AFTER EACH TX
-RECEIVE = False
-
 # THIS WILL GET ASSIGNED DURING INITIALIZATION
 CONNECTION = None
 
@@ -37,7 +34,6 @@ def initialize():
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS
     )
-    return CONNECTION.readline()
 
 
 ##############################
@@ -93,8 +89,8 @@ def tx_analog(pin_index, value):
 # READ RESPONSE FROM ARDUINO AND
 # SET VARIABLES IN global_data.py
 
-#def receive():
-#    if (RECEIVE):
-#        CONNECTION.readline()
+def receive():
+    print "receiving..."
+    print CONNECTION.readline()
 
 
