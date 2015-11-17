@@ -22,14 +22,38 @@ class map_interface:
         raise NotImplementedError()
 
 
-class simple_map(map_interface):
+class trigger_map(map_interface):
 
-    description = """Simple control map map:
+    description = """Triggers control map:
 
 X   -> Hold for Motor 1
 A   -> Hold for Motor 2
 L2  -> Wavelength
 R2  -> Frequency"""
+
+    def update(self, button_type, button_index, button_value):
+        if (button_type == global_data.TYPE_BUTTON):
+            if (button_index == global_data.BUTTON_X):
+                mctransmitter.tx_digital(0, button_value)
+            elif (button_index == global_data.BUTTON_A):
+                mctransmitter.tx_digital(1, button_value)
+        elif (button_type == global_data.TYPE_AXIS):
+            if (button_index == global_data.AXIS_LEFT_TRIGGER):
+                mctransmitter.tx_analog(0, button_value)
+            if (button_index == global_data.AXIS_RIGHT_TRIGGER):
+                mctransmitter.tx_analog(1, button_value)
+ 
+
+
+
+class simple_map(map_interface):
+
+    description = """Simple control map:
+
+X    -> Hold for Motor 1
+A    -> Hold for Motor 2
+Joy1 -> Wavelength
+Joy2 -> Frequency"""
 
     def update(self, button_type, button_index, button_value):
         if (button_type == global_data.TYPE_BUTTON):
@@ -69,5 +93,5 @@ R2  -> Frequency"""
 
  
 
-map_list = [simple_map(), toggle_map()]
+map_list = [trigger_map(), simple_map(), toggle_map()]
 
