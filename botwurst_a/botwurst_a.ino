@@ -49,7 +49,7 @@ byte cmd_value;
 
 void setup() {
     // INTIALIZE SERIAL COM
-    Serial.begin(BAUD);
+    Serial.begin(BAUD, SERIAL_CONFIG);
     
     // *** PIERS: YOU MIGHT PUT INITIALIZATIN CODE HERE *** //
     // INITIALIZE COMPUTATION AND GPIO

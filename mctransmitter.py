@@ -2,6 +2,7 @@
 # TRANSMITS COMMANDS TO THE ARDUINO OVER SERIAL
 #
 
+import os
 import sys
 import time
 import serial
@@ -29,7 +30,7 @@ def initialize():
         port_name = 'COM1'  # UNTESTED
 
     CONNECTION = serial.Serial(
-        port=portname,
+        port=port_name,
         baudrate=9600,
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
