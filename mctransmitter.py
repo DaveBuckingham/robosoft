@@ -21,8 +21,6 @@ CONNECTION = None
 ##############################
 
 # INITIALIZE SERIAL CONNECTION
-# CALLED AUTOMATICALLY ON FIRST
-# CALL TO tx_digital() or tx_analog()
 def initialize():
     global CONNECTION
     if (os.name == 'posix'):
