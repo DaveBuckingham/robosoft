@@ -24,8 +24,6 @@ ui_map.py
 Get button events from ui_hub
 Write and read global_data
 Send pin settings to mctransmitter
-*** ignores message returned by mctransmitter ***
-*** this should somehow be fed back into global_data ***
 
 
 mctransmitter.py

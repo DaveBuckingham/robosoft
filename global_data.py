@@ -6,13 +6,6 @@ analog_1_sent  = 0;
 digital_0_sent = False;
 digital_1_sent = False;
 
-# (CURRENLTY, NOTHING WRITES TO THIS -db)
-# RESPONSE RECIEVED FROM ARDUINO
-analog_0_confirmed  = 0;
-analog_1_confirmed  = 0;
-digital_0_confirmed = False;
-digital_1_confirmed = False;
-
 # BUTTON TYPES
 TYPE_BUTTON          = 'b'  # VALUE WILL BE 0 OR 1
 TYPE_AXIS            = 'a'  # VALUE WILL BE BETWEEN 0 AND 1

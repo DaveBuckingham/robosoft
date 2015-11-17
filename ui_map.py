@@ -1,4 +1,3 @@
-
 #
 # TO MAKE A NEW CONTROL MAP JUST:
 # 
@@ -69,14 +68,15 @@ Joy2 -> Frequency"""
         
 
 
+
 class toggle_map(map_interface):
 
     description = """Toggle motor states:
 
-X   -> Toggle Motor 1
-A   -> Toggle Motor 2
-L2  -> Wavelength
-R2  -> Frequency"""
+X    -> Toggle Motor 1
+A    -> Toggle Motor 2
+Joy1 -> Wavelength
+Joy2 -> Frequency"""
 
     def update(self, button_type, button_index, button_value):
         if (button_type == global_data.TYPE_BUTTON and button_value == True):

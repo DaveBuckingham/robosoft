@@ -25,10 +25,13 @@ CONNECTION = None
 # CALL TO tx_digital() or tx_analog()
 def initialize():
     global CONNECTION
+    if (os.name == 'posix'):
+        port_name = '/dev/ttyACM0'
+    else:
+        port_name = 'COM1'  # UNTESTED
+
     CONNECTION = serial.Serial(
-        # WHAT SHOULD THIS BE FOR WINDOWS? MAC?
-        # SHOULD DETECT OS AND ASSIGNN THIS ACCORDINGLY
-        port='/dev/ttyACM0',
+        port=portname,
         baudrate=9600,
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
@@ -37,7 +40,7 @@ def initialize():
 
 
 ##############################
-#          CLSOE COM         #
+#          CLOSE COM         #
 ##############################
 
 # PROBABLY NEVER NEED TO CALL THIS
@@ -81,16 +84,13 @@ def tx_analog(pin_index, value):
     #receive()
 
 
-
 ##############################
 #          RECEIVE           #
 ##############################
 
 # READ RESPONSE FROM ARDUINO AND
 # SET VARIABLES IN global_data.py
-
 def receive():
     print "receiving..."
     print CONNECTION.readline()
-
 

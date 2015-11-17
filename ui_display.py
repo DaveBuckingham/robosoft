@@ -37,34 +37,30 @@ def update():
     # BUILD STRING TO PRINT
 
     out =  ("\n")
-    out += ("                     TRANSMITTED                    CONFIRMED                         MODE")
+    out += ("                     TRANSMITTED                                MODE")
     out += ("\n")
 
-    FORMAT = "%-12s %-30s %-34s %-20s\n"
+    FORMAT = "%-12s %-34s %-20s\n"
 
     out += FORMAT % ("analog_0",
         __bar__(global_data.analog_0_sent),
-        __bar__(global_data.analog_0_confirmed),
         mode_text[0])
-    out += FORMAT % ("", "", "", mode_text[1])
+    out += FORMAT % ("", "", mode_text[1])
 
     out += FORMAT % ("analog_1",
         __bar__(global_data.analog_1_sent),
-        __bar__(global_data.analog_1_confirmed),
         mode_text[2])
-    out += FORMAT % ("", "", "", mode_text[3])
+    out += FORMAT % ("", "", mode_text[3])
 
     out += FORMAT % ("digital_0",
         __bar__(global_data.digital_0_sent),
-        __bar__(global_data.digital_0_confirmed),
         mode_text[4])
-    out += FORMAT % ("", "", "", mode_text[5])
+    out += FORMAT % ("", "", mode_text[5])
 
     out += FORMAT % ("digital_1",
         __bar__(global_data.digital_1_sent),
-        __bar__(global_data.digital_1_confirmed),
         mode_text[6])
-    out += FORMAT % ("", "", "", mode_text[7])
+    out += FORMAT % ("", "", mode_text[7])
 
 
     # CLEAR SCREEN

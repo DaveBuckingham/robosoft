@@ -30,9 +30,8 @@ ui_display.update()
 mctransmitter.initialize()
 
 
-# ITERATE OVER gamepad_interface.py OUTPUT
+# ITERATE OVER OUTPUT
 proc = subprocess.Popen(['python', '-u', './gamepad_to_stdout.py'], stdout=subprocess.PIPE)
-#proc = subprocess.Popen(['python', '-u', './gamepad_interface.py'], stdout=subprocess.PIPE)
 for line in iter(proc.stdout.readline,''):
 
     # REMOVE NEWLINE
@@ -64,7 +63,7 @@ for line in iter(proc.stdout.readline,''):
     else:
         if (button_type == global_data.TYPE_AXIS):
             ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
-        else:
+        elif (button_type == global_data.TYPE_BUTTON):
             ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
         
     # REFRESH

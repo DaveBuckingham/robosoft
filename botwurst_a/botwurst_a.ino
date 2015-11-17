@@ -42,12 +42,6 @@ char cmd_type;
 byte cmd_index;
 byte cmd_value;
 
-// STATE
-//byte digital_val_0;   // [0..1]
-//byte digital_val_1;   // [0..1]
-//byte analog_val_0;    // [0..255]
-//byte analog_val_1;    // [0..255]
-
 
 //////////////////////////////////////
 //           INTIIALIZE             //
@@ -99,50 +93,53 @@ void compute() {
 
 
 //////////////////////////////////////
-//       MAIN LOOP / TXRX           //
+//            MAIN LOOP             //
 //////////////////////////////////////
 
 void loop() {
 
     //////////////////////////
-    //     GET PIN TYPE     //
+    // RECEIVE TRANSMISSION //
     //////////////////////////
+
+    // READ TYPE
     if (! Serial.available()) {
         return;
     }
     cmd_type = Serial.read();
     if (cmd_type != 'a' && cmd_type != 'd') {
-        Serial.print("Invalid cmd type.\n");
         return;
     }
-    delay(SERIAL_DELAY);  // WAIT FOR REST OF DATA
 
+    // WAIT FOR REST OF DATA
+    delay(SERIAL_DELAY);
     if (! Serial.available()) {
         return;
     }
 
+    // READ INDEX
     cmd_index = Serial.read();
-
     if (! Serial.available()) {
         return;
     }
 
+    // READ VALUE
     cmd_value = Serial.read();
 
     //////////////////////////
-    //    ANALOG PIN        //
+    // PROCESS TRANSMISSION //
     //////////////////////////
+
+    // ANALOG PIN
     if (cmd_type == 'a') {
 
         // CHECK INDEX BOUNDS
         if (cmd_index < 0 || cmd_index >= NUM_ANALOG_VALS) {
-            Serial.print("Index out of range.\n");
             return;
         }
 
-        // READ CMD VALUE
+        // CHECK COMMAND BOUNDS
         if (cmd_value < 0 || cmd_value > ANALOG_HI) {
-            Serial.print("cmd value out of range.\n");
             return;
         }
 
@@ -152,19 +149,16 @@ void loop() {
         }
     }
 
-    //////////////////////////
-    //    DIGITIAL PIN      //
-    //////////////////////////
+    // DIGITIAL PIN
     else if (cmd_type == 'd') {
+
         // CHECK INDEX BOUNDS
         if (cmd_index < 0 || cmd_index >= NUM_DIGITAL_VALS) {
-            Serial.print("Index out of range.\n");
             return;
         }
 
-        // READ CMD VALUE
+        // CHECK COMMAND BOUNDS
         if (cmd_value < 0 || cmd_value > 1) {
-            Serial.print("cmd value out of range.\n");
             return;
         }
 
