@@ -1,8 +1,3 @@
-# robosoft
-
-Human interface for the Botwurst
-
-
 global_data.py
 Definitions and state to be shared by:
     ui_hub.py
@@ -10,8 +5,10 @@ Definitions and state to be shared by:
     ui_display.py
 
 
-gamepad_interface.py
-Read button events from gamepad and print to stdout.
+gamepad_to_stdout.py
+Read button events from gamepad.
+Filter noise and excessive events.
+Print to stdout.
 
 
 ui_hub.py
@@ -23,21 +20,21 @@ Call ui_display.py
 ui_map.py
 Get button events from ui_hub
 Write and read global_data
-Send pin settings to mctransmitter
+Map to commands and send them to mctransmitter
 
 
 mctransmitter.py
-Recieve pin settings from ui_map and send them over serial to botwurst_a
-Returns confirmation message recieved over serial
+Recieve commands from ui_map and send them over serial to botwurst_a
 
 
 botwurst_a
-Arduino code. Recieve pin settings over serial, set pins, and send confirmation
-back over serial
+Arduino code.
+Recieve commands over serial
+Perform any calculation
+Set pins.
 
 
 ui_display.py
 Print status of global_data to screen.
 Simple ascii display.
-Might want to replace this with something prettier.
 

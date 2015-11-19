@@ -16,8 +16,8 @@ import sys
 import time
 
 
-AXIS_VALUE_THRESHOLD = 0.1
-AXIS_TIME_THRESHOLD = .2
+AXIS_ZERO_THRESHOLD = 0.1
+AXIS_TIME_THRESHOLD = .15
 
 
 ################
@@ -49,11 +49,11 @@ while gamepad_count:
 
         # AXES
         if event.type == pygame.JOYAXISMOTION:
-                if (abs(event.value) < AXIS_VALUE_THRESHOLD):
+                if (abs(event.value) < AXIS_ZERO_THRESHOLD):
                     new_axis_value[event.axis] = 0.0
-                elif (abs(event.value + 1) < AXIS_VALUE_THRESHOLD):
+                elif (event.value + 1 < AXIS_ZERO_THRESHOLD):
                     new_axis_value[event.axis] = -1.0
-                elif (abs(event.value - 1) < AXIS_VALUE_THRESHOLD):
+                elif (event.value - 1 > -AXIS_ZERO_THRESHOLD):
                     new_axis_value[event.axis] = 1.0
                 else:
                     new_axis_value[event.axis] = event.value

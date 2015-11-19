@@ -38,3 +38,10 @@ D_PAD                = 0
 # ARRAY DEFINED IN ui_map.py
 map_index = 0
 
+
+
+
+# ONLY USED BY ui_map:
+axis_0_locked = False
+axis_1_locked = False
+
