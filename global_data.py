@@ -6,6 +6,13 @@ analog_1_sent  = 0;
 digital_0_sent = False;
 digital_1_sent = False;
 
+# RECORD MODE
+record = False
+file_number = None #None if not recording
+record_array = () #Stores quads (PIN TYPE, PIN INDEX, value, time step)
+playback_array = () #Populated from a recording file, for playback
+record_start_time = None
+
 # BUTTON TYPES
 TYPE_BUTTON          = 'b'  # VALUE WILL BE 0 OR 1
 TYPE_AXIS            = 'a'  # VALUE WILL BE BETWEEN 0 AND 1
