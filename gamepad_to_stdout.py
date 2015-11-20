@@ -16,7 +16,7 @@ import sys
 import time
 
 
-AXIS_ZERO_THRESHOLD = 0.1
+AXIS_ZERO_THRESHOLD = 0.13
 AXIS_TIME_THRESHOLD = .15
 
 
@@ -33,11 +33,29 @@ if gamepad_count:
 else:
     sys.exit("no gamepad")
 
-
 last_axis_time = [0.0] * 6
 last_axis_value = [0.0] * 6
 new_axis_value = [0.0] * 6
 
+################
+# CONVERT DPAD #
+################
+def dpad_convert(input):
+    if (input == (-1, 0)):
+        return 1
+    elif (input == (0, 1)):
+        return 2
+    elif (input == (1, 0)):
+        return 3
+    elif (input == (0, -1)):
+        return 4
+    return 0
+
+
+
+################
+#     LOOP     #
+################
 while gamepad_count:
     for event in pygame.event.get():
 
@@ -60,7 +78,7 @@ while gamepad_count:
 
         # DPAD
         if event.type == pygame.JOYHATMOTION:
-            print '{} d {} {}'.format(event.joy, event.hat, event.value)
+            print '{} d {} {}'.format(event.joy, event.hat, dpad_convert(event.value))
 
 
     now = time.time()
