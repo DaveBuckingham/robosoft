@@ -8,10 +8,12 @@ digital_1_sent = False;
 
 # RECORD MODE
 record = False
-file_number = None #None if not recording
-record_array = () #Stores quads (PIN TYPE, PIN INDEX, value, time step)
-playback_array = () #Populated from a recording file, for playback
+record_file_number = None   # None if not recording
+record_array = []           # List that stores quads (PIN TYPE, PIN INDEX, value, time step)
 record_start_time = None
+
+playback_array = []         # Populated from a recording file, for playback
+
 
 # BUTTON TYPES
 TYPE_BUTTON          = 'b'  # VALUE WILL BE 0 OR 1
