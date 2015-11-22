@@ -9,6 +9,7 @@ digital_1_sent = False;
 # RECORD MODE
 record = False
 record_file_number = None   # None if not recording
+record_save_directory = 'botwurst_command_recordings'
 record_array = []           # List that stores quads (PIN TYPE, PIN INDEX, value, time step)
 record_start_time = None
 
