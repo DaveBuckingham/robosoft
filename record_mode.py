@@ -16,6 +16,7 @@ save_filename_prefix = 'botwurst_command_record_'
 # TODO: look at threading so that we could run multiple processes at once.
 #       - eg. record over playback, or pause a playback
 
+
 # HELPER FUNCTIONS FOR DIRECTORY NAVIGATION
 def get_curr_directory():
     curr_dir = os.getcwd()
@@ -184,11 +185,11 @@ def populate_playback_array_from_file(filename, is_file_tag=False, save_director
 
 def playback_instruction(instruction_from_array):
     if instruction_from_array[0] == 'd':
-        print "DIGITAL,  PIN_INDEX: ", instruction_from_array[1], "VALUE: ", instruction_from_array[2]
-        # mctransmitter.tx_digital(instruction_from_array[1], instruction_from_array[2])
+        #print "DIGITAL,  PIN_INDEX: ", instruction_from_array[1], "VALUE: ", instruction_from_array[2]
+        mctransmitter.tx_digital(instruction_from_array[1], instruction_from_array[2])
     elif instruction_from_array[0] == 'a':
-        print "ANALOG,  PIN_INDEX: ", instruction_from_array[1], "VALUE: ", instruction_from_array[2]
-        # mctransmitter.tx_digital(instruction_from_array[1], instruction_from_array[2])
+        #print "ANALOG,  PIN_INDEX: ", instruction_from_array[1], "VALUE: ", instruction_from_array[2]
+        mctransmitter.tx_analog(instruction_from_array[1], instruction_from_array[2])
 
 
 def playback_from_array():

@@ -12,6 +12,7 @@ import os
 import sys
 import time
 
+import record_mode
 import mctransmitter  # COM WITH ARDUINO
 import global_data    # SHARED WITH ui_display AND ui_map
 import ui_map         # MAP BUTTON EVENTS TO PIN COMMANDS
@@ -65,7 +66,18 @@ for line in iter(proc.stdout.readline,''):
         global_data.map_index = (global_data.map_index + 1) % len(ui_map.map_list)
 
     # IF DPAD, SET RECORD STATE
-#    elif (button_type == global_data.TYPE_DPAD): 
+    elif (button_type == global_data.TYPE_DPAD): 
+        if (button_value == 1):
+            if (global_data.record):
+                record_mode.create_record_file()
+                print "saving recording"
+            else:
+                print "starting recording"
+                record_mode.initialize_record_mode(button_value)
+        if (button_value == 3):
+            print "playback"
+            record_mode.playback_from_file(1, True)
+         
 #        if (global_data.record):
 #            global_data.record = 0
 #            # record_mode.end_recording()
@@ -98,5 +110,5 @@ for line in iter(proc.stdout.readline,''):
             ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
         
     # REFRESH
-    ui_display.update()
+    #ui_display.update()
 
