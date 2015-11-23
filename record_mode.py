@@ -13,6 +13,8 @@ import time
 
 save_filename_prefix = 'botwurst_command_record_'
 
+# TODO: look at threading so that we could run multiple processes at once.
+#       - eg. record over playback, or pause a playback
 
 # HELPER FUNCTIONS FOR DIRECTORY NAVIGATION
 def get_curr_directory():
@@ -192,6 +194,11 @@ def playback_instruction(instruction_from_array):
 def playback_from_array():
     curr_time_stamp = 0
     for instruction in global_data.playback_array:
+        # TODO: I think that this won't work at the moment, because we can't pause while this process is happening?
+        # while global_data.playback_paused:
+        #     time.sleep(.5)
+        #     print "PLAYBACK PAUSED"
+
         temp_time_stamp = instruction[3]
         time_diff = (temp_time_stamp - curr_time_stamp)
         time.sleep(time_diff)
