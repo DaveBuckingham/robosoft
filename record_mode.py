@@ -10,14 +10,11 @@ import datetime
 import os
 import errno
 import time
+import threading
 
 save_filename_prefix = 'botwurst_command_record_'
-record_save_directory = 'botwurst_command_recordings'
+default_save_directory = 'botwurst_command_recordings'
 save_file_extension = '.dat'
-
-
-# TODO: look at threading so that we could run multiple processes at once.
-#       - eg. record over playback, or pause a playback
 
 
 def make_directory(directory_name):
@@ -37,7 +34,7 @@ def print_global_record_variables():
     print "RECORDING VARIABLE SETTINGS"
     print "===================="
     print "Recording: ", global_data.record
-    print "Will store in file numbered: ", global_data.record_file_number, " in directory: ", record_save_directory
+    print "Will store in file numbered: ", global_data.record_file_number, " in directory: ", default_save_directory
     print "Initial time: ", global_data.record_start_time
     print "Recording array is empty: ", (len(global_data.record_array) == 0)
     print "===================="
@@ -61,7 +58,7 @@ def initialize_record_mode(file_number):
     global_data.record_file_number = file_number
     global_data.record_start_time = datetime.datetime.now()
 
-    make_directory(record_save_directory)
+    make_directory(default_save_directory)
     # if save_directory already exists as subdirectory, nothing will happen
 
 
@@ -95,7 +92,7 @@ def create_record_file(file_tag=None, save_directory=None):
     if file_tag is None:
         file_tag = global_data.record_file_number
     if save_directory is None:
-        save_directory = record_save_directory
+        save_directory = default_save_directory
 
     record_filename = save_directory + '/' + save_filename_prefix + str(file_tag) + save_file_extension
 
@@ -112,7 +109,7 @@ def create_record_file(file_tag=None, save_directory=None):
     global_data.record_array = []
 
 
-# TODO: PLAYBACK FUNCTIONS
+# 2) PLAYBACK FUNCTIONS
 def clear_playback_array():
     global_data.playback_array = []
 
@@ -126,7 +123,7 @@ def populate_playback_array_from_file(filename, is_file_tag=False, save_director
     :param save_directory: default directory specified in global data
     """
     if save_directory is None:
-        save_directory = record_save_directory
+        save_directory = default_save_directory
 
     if is_file_tag:
         filename = save_filename_prefix + str(filename)
@@ -138,47 +135,79 @@ def populate_playback_array_from_file(filename, is_file_tag=False, save_director
         global_data.playback_array.append((eval(line.rstrip())))
 
 
-def playback_instruction(instruction_from_array):
-    if instruction_from_array[0] == 'd':
-        print "DIGITAL,  PIN_INDEX: ", instruction_from_array[1], "VALUE: ", instruction_from_array[2]
+def playback_instruction(pin_type, pin_index, value):
+    if pin_type == 'd':
+        print "DIGITAL,  PIN_INDEX: ", pin_index, "VALUE: ", value
         # mctransmitter.tx_digital(instruction_from_array[1], instruction_from_array[2])
-    elif instruction_from_array[0] == 'a':
-        print "ANALOG,  PIN_INDEX: ", instruction_from_array[1], "VALUE: ", instruction_from_array[2]
+    elif pin_type == 'a':
+        print "ANALOG,  PIN_INDEX: ", pin_index, "VALUE: ", value
         # mctransmitter.tx_analog(instruction_from_array[1], instruction_from_array[2])
 
 
-def playback_from_array():
-    curr_time_stamp = 0
-    for instruction in global_data.playback_array:
-        # TODO: I think that this won't work at the moment, because we can't pause while this process is happening?
-        # while global_data.playback_paused:
-        #     time.sleep(.5)
-        #     print "PLAYBACK PAUSED"
+class Playback_From_Array(threading.Thread):
+    def __init__(self, parent, queue):
+        threading.Thread.__init__(self)
+        self._queue = queue
+        self._parent = parent
+        self.start()
 
-        temp_time_stamp = instruction[3]
-        time_diff = (temp_time_stamp - curr_time_stamp)
-        time.sleep(time_diff)
-        playback_instruction(instruction)
+    def run(self):
+        curr_time_stamp = 0
+        for instruction in self._queue:
+            while global_data.playback_paused:
+                time.sleep(.1)
 
-        curr_time_stamp = temp_time_stamp
+            temp_time_stamp = instruction[3]
+            time_diff = (temp_time_stamp - curr_time_stamp)
+            time.sleep(time_diff)
+            playback_instruction(instruction[0], instruction[1], instruction[2])
 
-    clear_playback_array()
+            curr_time_stamp = temp_time_stamp
+
+        clear_playback_array()
 
 
 def playback_from_file(filename, is_file_tag=False, save_directory=None):
     clear_playback_array()
     populate_playback_array_from_file(filename, is_file_tag, save_directory)
-    playback_from_array()
+    playback_thread = Playback_From_Array(None, global_data.playback_array)
+    return playback_thread
 
 
-# TESTING
-# def main():
-#     print "***** FIRST LINE IN MAIN ***************"
-#     print "****************************************"
+# TESTING FUNCTIONS: TO REMOVE
+# class Print_Hello_Every_Sec(threading.Thread):
+#     def __init__(self, parent, queue):
+#         threading.Thread.__init__(self)
+#         self._queue = queue
+#         self._parent = parent
+#         self.start()
+#
+#     def run(self):
+#         for i in range(15):
+#             print "**********HELLO THERE**************"
+#             time.sleep(1)
+#
+# class Pause_Unpause(threading.Thread):
+#     def __init__(self, parent, queue):
+#         threading.Thread.__init__(self)
+#         self._queue = queue
+#         self._parent = parent
+#         self.start()
+#
+#     def run(self):
+#         time.sleep(2)
+#         global_data.playback_paused = True
+#         print "PAUSING"
+#         time.sleep(10)
+#         print "UNPAUSING"
+#         global_data.playback_paused = False
+#
+#
+# def create_dummy_instruction_file(file_tag):
 #     short_delay = 0.1
 #     long_delay = 1
 #
-#     initialize_record_mode(5)
+#     initialize_record_mode(file_tag)
 #     print_global_record_variables()
 #
 #     i = 1
@@ -212,13 +241,21 @@ def playback_from_file(filename, is_file_tag=False, save_directory=None):
 #         i = i + 1
 #         j = j + 20
 #
-#     # print "RECORDED INSTRUCTIONS:"
-#     # print "===================="
-#     # for record_instance in global_data.record_array:
-#     #     print record_instance
-#
 #     create_record_file()
-#     playback_from_file(5, True)
+#
+# def main():
+#     test_file_tag = 5
+#     # create_dummy_instruction_file(test_file_tag)
+#
+#     pause_thread = Pause_Unpause(None, None)
+#     playback_thread = playback_from_file(test_file_tag, True)
+#     print_hello_thread = Print_Hello_Every_Sec(None, None)
+#
+#     print_hello_thread.join()
+#     playback_thread.join()
+#     pause_thread.join()
+#
 #     print_global_record_variables()
+#
 #
 # main()
