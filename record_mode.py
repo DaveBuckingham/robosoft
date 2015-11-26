@@ -12,23 +12,12 @@ import errno
 import time
 
 save_filename_prefix = 'botwurst_command_record_'
+record_save_directory = 'botwurst_command_recordings'
+save_file_extension = '.dat'
+
 
 # TODO: look at threading so that we could run multiple processes at once.
 #       - eg. record over playback, or pause a playback
-
-
-# HELPER FUNCTIONS FOR DIRECTORY NAVIGATION
-def get_curr_directory():
-    curr_dir = os.getcwd()
-    curr_dir = os.path.split(curr_dir)[1]
-
-    return curr_dir
-
-
-def is_current_directory(directory_name):
-    curr_dir = get_curr_directory()
-
-    return curr_dir == directory_name
 
 
 def make_directory(directory_name):
@@ -39,26 +28,8 @@ def make_directory(directory_name):
             raise
 
 
-def change_to_directory(directory_name):
-    changed_dir = True
-
-    if not is_current_directory(directory_name):
-        try:
-            os.chdir(directory_name + '/')
-        except OSError:
-            os.chdir('../')
-
-            if not is_current_directory(directory_name):
-                try:
-                    os.chdir(directory_name + '/')
-                except OSError:
-                    changed_dir = False
-
-    return changed_dir
-
-
 def set_default_save_directory(directory_name):
-    global_data.record_save_directory = directory_name
+    record_save_directory = directory_name
 
 
 # HELPER FUNCTION FOR LOOKING AT GLOBAL VARIABLES
@@ -66,7 +37,7 @@ def print_global_record_variables():
     print "RECORDING VARIABLE SETTINGS"
     print "===================="
     print "Recording: ", global_data.record
-    print "Will store in file numbered: ", global_data.record_file_number, " in directory: ", global_data.record_save_directory
+    print "Will store in file numbered: ", global_data.record_file_number, " in directory: ", record_save_directory
     print "Initial time: ", global_data.record_start_time
     print "Recording array is empty: ", (len(global_data.record_array) == 0)
     print "===================="
@@ -90,9 +61,8 @@ def initialize_record_mode(file_number):
     global_data.record_file_number = file_number
     global_data.record_start_time = datetime.datetime.now()
 
-    if not is_current_directory(global_data.record_save_directory):
-        make_directory(global_data.record_save_directory)
-        # if save_directory already exists as subdirectory, nothing will happen
+    make_directory(record_save_directory)
+    # if save_directory already exists as subdirectory, nothing will happen
 
 
 def append_instruction(instruction):
@@ -125,28 +95,15 @@ def create_record_file(file_tag=None, save_directory=None):
     if file_tag is None:
         file_tag = global_data.record_file_number
     if save_directory is None:
-        save_directory = global_data.record_save_directory
+        save_directory = record_save_directory
 
-    # Remember the directory we were in before changing into save_directory
-    previous_dir = get_curr_directory()
-
-    # change into directory where file will be saved
-    if not change_to_directory(save_directory):
-        print "***ERROR WHILE SAVING TO DIRECTORY: ", save_directory, " is missing, creating new directory***"
-        os.makedirs(save_directory + '/')
-        os.chdir(save_directory + '/')
-
-    record_filename = save_filename_prefix + str(file_tag) + '.txt'
+    record_filename = save_directory + '/' + save_filename_prefix + str(file_tag) + save_file_extension
 
     # Create new file, or overwrite file if it exists
     with open(record_filename, 'w') as recording_file:
         # Copy all commands to the file
         for command in global_data.record_array:
             recording_file.write(str(command) + '\n')
-
-    # Return to previous working directory
-    if not change_to_directory(previous_dir):
-        print "***ERROR IN CREATE RECORD FILE: Had problems restoring directory to ", previous_dir, "***"
 
     # Reinitialize all record variables
     global_data.record = False
@@ -169,14 +126,12 @@ def populate_playback_array_from_file(filename, is_file_tag=False, save_director
     :param save_directory: default directory specified in global data
     """
     if save_directory is None:
-        save_directory = global_data.record_save_directory
-
-    change_to_directory(save_directory)
+        save_directory = record_save_directory
 
     if is_file_tag:
         filename = save_filename_prefix + str(filename)
 
-    playback_file = open(str(filename) + '.txt', 'r')
+    playback_file = open(save_directory + '/' + str(filename) + save_file_extension, 'r')
     playback_file_lines = playback_file.readlines()
 
     for line in playback_file_lines:
@@ -185,11 +140,11 @@ def populate_playback_array_from_file(filename, is_file_tag=False, save_director
 
 def playback_instruction(instruction_from_array):
     if instruction_from_array[0] == 'd':
-        #print "DIGITAL,  PIN_INDEX: ", instruction_from_array[1], "VALUE: ", instruction_from_array[2]
-        mctransmitter.tx_digital(instruction_from_array[1], instruction_from_array[2])
+        print "DIGITAL,  PIN_INDEX: ", instruction_from_array[1], "VALUE: ", instruction_from_array[2]
+        # mctransmitter.tx_digital(instruction_from_array[1], instruction_from_array[2])
     elif instruction_from_array[0] == 'a':
-        #print "ANALOG,  PIN_INDEX: ", instruction_from_array[1], "VALUE: ", instruction_from_array[2]
-        mctransmitter.tx_analog(instruction_from_array[1], instruction_from_array[2])
+        print "ANALOG,  PIN_INDEX: ", instruction_from_array[1], "VALUE: ", instruction_from_array[2]
+        # mctransmitter.tx_analog(instruction_from_array[1], instruction_from_array[2])
 
 
 def playback_from_array():
@@ -218,74 +173,52 @@ def playback_from_file(filename, is_file_tag=False, save_directory=None):
 
 # TESTING
 # def main():
-    #
-    # short_delay = 0.1
-    # long_delay = 1
-    #
-    # initialize_record_mode(5)
-    # print_global_record_variables()
-    #
-    # i = 1
-    # j = 0
-    #
-    # for iterator in range(10):
-    #     i_is_even = (1 == i%2)
-    #
-    #     digital_instruction = ('d', 0, i_is_even)
-    #     append_instruction(digital_instruction)
-    #
-    #     time.sleep(short_delay)
-    #
-    #     digital_instruction = ('d', 1, not i_is_even)
-    #     append_instruction(digital_instruction)
-    #
-    #     time.sleep(short_delay)
-    #
-    #     val = abs((j % 510) - 255)
-    #
-    #     analog_instruction = ('a', 0, val)
-    #     append_instruction(analog_instruction)
-    #
-    #     time.sleep(short_delay)
-    #
-    #     analog_instruction = ('a', 1, 255 - val)
-    #     append_instruction(analog_instruction)
-    #
-    #     time.sleep(long_delay)
-    #
-    #     i = i + 1
-    #     j = j + 20
-    #
-    # # print "RECORDED INSTRUCTIONS:"
-    # # print "===================="
-    # # for record_instance in global_data.record_array:
-    # #     print record_instance
-    #
-    # create_record_file()
-    # populate_playback_array_from_file(5, True)
-    #
-    # playback_from_array()
-
-
+#     print "***** FIRST LINE IN MAIN ***************"
+#     print "****************************************"
+#     short_delay = 0.1
+#     long_delay = 1
+#
+#     initialize_record_mode(5)
+#     print_global_record_variables()
+#
+#     i = 1
+#     j = 0
+#
+#     for iterator in range(10):
+#         i_is_even = (1 == i%2)
+#
+#         digital_instruction = ('d', 0, i_is_even)
+#         append_instruction(digital_instruction)
+#
+#         time.sleep(short_delay)
+#
+#         digital_instruction = ('d', 1, not i_is_even)
+#         append_instruction(digital_instruction)
+#
+#         time.sleep(short_delay)
+#
+#         val = abs((j % 510) - 255)
+#
+#         analog_instruction = ('a', 0, val)
+#         append_instruction(analog_instruction)
+#
+#         time.sleep(short_delay)
+#
+#         analog_instruction = ('a', 1, 255 - val)
+#         append_instruction(analog_instruction)
+#
+#         time.sleep(long_delay)
+#
+#         i = i + 1
+#         j = j + 20
+#
+#     # print "RECORDED INSTRUCTIONS:"
+#     # print "===================="
+#     # for record_instance in global_data.record_array:
+#     #     print record_instance
+#
+#     create_record_file()
+#     playback_from_file(5, True)
+#     print_global_record_variables()
+#
 # main()
-
-# TO TEST TIME STAMP CREATION PUT IN MAIN
-#
-#     time_stamp_list = []
-#     time_stamp = datetime.datetime.now()
-#
-#     time_stamp_list.append(time_stamp)
-#
-#     for i in range(9):
-#
-#         time.sleep(.1)
-#         temp_time = datetime.datetime.now()
-#         time_stamp_list.append(temp_time)
-#
-#     print time_stamp_list
-#
-#     for time_stamp_item in time_stamp_list:
-#
-#         time_diff = time_stamp_item - time_stamp
-#         print time_diff.total_seconds()
-#
