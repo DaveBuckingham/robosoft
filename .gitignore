@@ -1,10 +1,4 @@
 *.xml
 .idea/robosoft.iml
-botwurst_command_recordings/botwurst_command_record_5.txt
-botwurst_command_recordings/botwurst_command_record_None.txt
-global_data.pyc
-global_data.pyc
-mctransmitter.pyc
-botwurst_command_recordings/botwurst_command_record_5.dat
+*.dat
 *.pyc
-global_data.pyc
