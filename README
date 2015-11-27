@@ -38,3 +38,11 @@ ui_display.py
 Print status of global_data to screen.
 Simple ascii display.
 
+record_mode.py
+    Initialize variables in global_data for recording
+    Store recording to file
+    Playback from file (can pause or cancel playback)
+
+    note: playback function returns a thread
+
+
