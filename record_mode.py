@@ -155,7 +155,11 @@ class Playback_From_Array(threading.Thread):
         curr_time_stamp = 0
         for instruction in self._queue:
             while global_data.playback_paused:
+                if global_data.playback_cancel:
+                    break
                 time.sleep(.1)
+            if global_data.playback_cancel:
+                break
 
             temp_time_stamp = instruction[3]
             time_diff = (temp_time_stamp - curr_time_stamp)
@@ -198,7 +202,10 @@ def playback_from_file(filename, is_file_tag=False, save_directory=None):
 #         time.sleep(2)
 #         global_data.playback_paused = True
 #         print "PAUSING"
-#         time.sleep(10)
+#         time.sleep(5)
+#         global_data.playback_cancel = True
+#         print "CANCELLING"
+#         time.sleep(5)
 #         print "UNPAUSING"
 #         global_data.playback_paused = False
 #

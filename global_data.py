@@ -13,7 +13,8 @@ record_array = []           # List that stores quads (PIN TYPE, PIN INDEX, value
 record_start_time = None
 
 playback_array = []         # Populated from a recording file, for playback
-playback_paused = False  # Currently, I don't think we can pause during playback, may need threading to do so.
+playback_paused = False
+playback_cancel = False
 
 
 # BUTTON TYPES
