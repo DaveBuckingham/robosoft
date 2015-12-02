@@ -12,6 +12,8 @@ import errno
 import time
 import threading
 
+# TODO set recording limit
+
 save_filename_prefix = 'botwurst_command_record_'
 default_save_directory = 'botwurst_command_recordings'
 save_file_extension = '.dat'
@@ -137,11 +139,11 @@ def populate_playback_array_from_file(filename, is_file_tag=False, save_director
 
 def playback_instruction(pin_type, pin_index, value):
     if pin_type == 'd':
-        print "DIGITAL,  PIN_INDEX: ", pin_index, "VALUE: ", value
-        # mctransmitter.tx_digital(instruction_from_array[1], instruction_from_array[2])
+        #print "DIGITAL,  PIN_INDEX: ", pin_index, "VALUE: ", value
+        mctransmitter.tx_digital(pin_index, value)
     elif pin_type == 'a':
-        print "ANALOG,  PIN_INDEX: ", pin_index, "VALUE: ", value
-        # mctransmitter.tx_analog(instruction_from_array[1], instruction_from_array[2])
+        # print "ANALOG,  PIN_INDEX: ", pin_index, "VALUE: ", value
+        mctransmitter.tx_analog(pin_index, value)
 
 
 class Playback_From_Array(threading.Thread):

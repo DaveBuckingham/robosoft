@@ -8,7 +8,7 @@ import time
 import serial
 import struct
 import global_data
-# import record_mode
+import record_mode
 
 
 # SET TO FALSE FOR TESTING WITHOUT ARDUINO

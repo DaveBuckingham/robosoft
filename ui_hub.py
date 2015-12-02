@@ -10,7 +10,7 @@ float, float, bool, bool '''
 import subprocess
 import os
 import sys
-import time
+import threading
 
 import record_mode
 import mctransmitter  # COM WITH ARDUINO
@@ -23,6 +23,7 @@ DPAD_DELAY = 1.5  # HOLD DPAD THIS LONG TO START RECORD
 dpad_start_time = 0  # TRACK DPAD HOLD TIME
 dpad_hold_value = 0
 
+# record_mode_timer = threading.Timer(DPAD_DELAY, record_mode.create_record_file())
 
 # CONVERT VALUES FROM GAMEPAD TO ARDUINO RANGES
 def scale_analog(val):   # [-1,1] -> [0,255]
@@ -60,24 +61,25 @@ for line in iter(proc.stdout.readline,''):
     else:
         sys.exit("Read invalid button type")
 
-
+    # TODO 2 sec hold down record
     # IF SELECT BUTTON PUSHED, INCREMENT MAP
     if (button_type == global_data.TYPE_BUTTON and button_index == global_data.BUTTON_SELECT and button_value):
         global_data.map_index = (global_data.map_index + 1) % len(ui_map.map_list)
 
     # IF DPAD, SET RECORD STATE
-    elif (button_type == global_data.TYPE_DPAD): 
-        if (button_value == 1):
-            if (global_data.record):
-                record_mode.create_record_file()
-                print "saving recording"
-            else:
-                print "starting recording"
+    elif (button_type == global_data.TYPE_DPAD):
+        if button_value == 1:
+            if not global_data.record:
                 record_mode.initialize_record_mode(button_value)
-        if (button_value == 3):
+                print "START RECORDING"
+            elif global_data.record:
+                record_mode.create_record_file()
+                print "SAVE RECORDING"
+
+        if button_value == 3:
             print "playback"
             record_mode.playback_from_file(1, True)
-         
+
 #        if (global_data.record):
 #            global_data.record = 0
 #            # record_mode.end_recording()
@@ -110,5 +112,5 @@ for line in iter(proc.stdout.readline,''):
             ui_map.map_list[global_data.map_index].update(button_type, button_index, button_value)
         
     # REFRESH
-    #ui_display.update()
+    ui_display.update()
 
