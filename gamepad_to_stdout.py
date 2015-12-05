@@ -37,20 +37,22 @@ last_axis_time = [0.0] * 6
 last_axis_value = [0.0] * 6
 new_axis_value = [0.0] * 6
 
+
 ################
 # CONVERT DPAD #
 ################
-def dpad_convert(input):
-    if (input == (-1, 0)):
+def dpad_convert(dpad_tuple):
+    if (dpad_tuple == (0,0)):
+        return 0
+    elif (dpad_tuple == (-1, 0)):
         return 1
-    elif (input == (0, 1)):
+    elif (dpad_tuple == (0, 1)):
         return 2
-    elif (input == (1, 0)):
+    elif (dpad_tuple == (1, 0)):
         return 3
-    elif (input == (0, -1)):
+    elif (dpad_tuple == (0, -1)):
         return 4
-    return 0
-
+    return -1
 
 
 ################

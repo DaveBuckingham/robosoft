@@ -12,7 +12,7 @@ import record_mode
 
 
 # SET TO FALSE FOR TESTING WITHOUT ARDUINO
-TRANSMIT = True
+TRANSMIT = False
 
 # THIS WILL GET ASSIGNED DURING INITIALIZATION
 CONNECTION = None
@@ -59,14 +59,15 @@ def tx_digital(pin_index, value):
     if (not isinstance(value, bool)):
         sys.exit("Non-boolean value arg to tx_digital")
     packed = struct.pack('!cB?', 'd', pin_index, value)
+    if (global_data.record):
+        record_mode.append_instruction(('d', pin_index, value))
     if (TRANSMIT):
-        if (global_data.record):
-            record_mode.append_instruction(('d', pin_index, value))
         CONNECTION.write(packed)
     if (pin_index == 0):
         global_data.digital_0_sent = value
     elif (pin_index == 1):
         global_data.digital_1_sent = value
+
     #receive()
         
 
@@ -77,9 +78,9 @@ def tx_analog(pin_index, value):
     if (not isinstance(value, int)):
         sys.exit("Non-int value arg to tx_digital: {}".format(value))
     packed = struct.pack('!cBB', 'a', pin_index, value)
+    if (global_data.record):
+        record_mode.append_instruction(('a', pin_index, value))
     if (TRANSMIT):
-        if (global_data.record):
-            record_mode.append_instruction(('a', pin_index, value))
         CONNECTION.write(packed)
     if (pin_index == 0):
         global_data.analog_0_sent = value

@@ -26,7 +26,7 @@ def __bar__(val):
 # UPDATE DISPLAY
 def update():
 
-    # GET DESCRIPTION OF THE CURRINT CONTROL MAP
+    # GET DESCRIPTION OF THE CURRENT CONTROL MAP
     mode_text = ui_map.map_list[global_data.map_index].description.split('\n')
 
     # 8 = NUMBER OF ROWS WE WILL PRINT
@@ -62,6 +62,18 @@ def update():
         mode_text[6])
     out += FORMAT % ("", "", mode_text[7])
 
+    # TODO weirdness with clearing?
+    out += ("\n")
+    record_message = "NOT RECORDING"
+    if global_data.record:
+        record_message = "RECORDING TO FILE NUMBER: " + str(global_data.record_file_number)
+    out += record_message
+
+    out += ("\n")
+    playback_message = "NOT PLAYING BACK"
+    if global_data.playback:
+        playback_message = "PLAYING BACK FROM FILE NUMBER: " + str(global_data.playback_file_number)
+    out += playback_message
 
     # CLEAR SCREEN
     if (os.name == 'posix'):

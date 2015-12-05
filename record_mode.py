@@ -11,14 +11,16 @@ import os
 import errno
 import time
 import threading
+import ui_display
 
-# TODO set recording limit
+playback_file_tag = None
 
 save_filename_prefix = 'botwurst_command_record_'
 default_save_directory = 'botwurst_command_recordings'
 save_file_extension = '.dat'
 
 
+# TODO set recording limit]
 def make_directory(directory_name):
     try:
         os.makedirs(directory_name + '/')
@@ -50,7 +52,6 @@ def initialize_record_mode(file_number):
 
     :param file_number: Tag for file where recording will be stored
     """
-
     # if record_array is not empty back it up to file
     if global_data.record_array:
         file_tag = global_data.record_file_number + "_backup"
@@ -60,8 +61,8 @@ def initialize_record_mode(file_number):
     global_data.record_file_number = file_number
     global_data.record_start_time = datetime.datetime.now()
 
-    make_directory(default_save_directory)
     # if save_directory already exists as subdirectory, nothing will happen
+    make_directory(default_save_directory)
 
 
 def append_instruction(instruction):
@@ -139,7 +140,7 @@ def populate_playback_array_from_file(filename, is_file_tag=False, save_director
 
 def playback_instruction(pin_type, pin_index, value):
     if pin_type == 'd':
-        #print "DIGITAL,  PIN_INDEX: ", pin_index, "VALUE: ", value
+        # print "DIGITAL,  PIN_INDEX: ", pin_index, "VALUE: ", value
         mctransmitter.tx_digital(pin_index, value)
     elif pin_type == 'a':
         # print "ANALOG,  PIN_INDEX: ", pin_index, "VALUE: ", value
@@ -169,14 +170,22 @@ class Playback_From_Array(threading.Thread):
             playback_instruction(instruction[0], instruction[1], instruction[2])
 
             curr_time_stamp = temp_time_stamp
+            ui_display.update()
 
         clear_playback_array()
+        global_data.playback = False
+        global_data.playback_file_number = None
+        ui_display.update()
 
 
 def playback_from_file(filename, is_file_tag=False, save_directory=None):
     clear_playback_array()
+    global_data.playback = True
+    global_data.playback_file_number = filename
+
     populate_playback_array_from_file(filename, is_file_tag, save_directory)
     playback_thread = Playback_From_Array(None, global_data.playback_array)
+
     return playback_thread
 
 

@@ -12,9 +12,12 @@ record_file_number = None   # None if not recording
 record_array = []           # List that stores quads (PIN TYPE, PIN INDEX, value, time step)
 record_start_time = None
 
+playback = False
+playback_file_number = None
 playback_array = []         # Populated from a recording file, for playback
 playback_paused = False
 playback_cancel = False
+
 
 
 # BUTTON TYPES
