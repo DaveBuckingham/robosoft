@@ -79,8 +79,8 @@ def update():
     if (os.name == 'posix'):
         os.system('clear')
     else:
-        # NOT SURE ABOUT WINDOWS
-        os.system('clear') 
+        # WINDOWS
+        os.system('cls')
 
     # PRINT THE STRING
     print out

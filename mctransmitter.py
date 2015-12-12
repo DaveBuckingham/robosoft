@@ -12,7 +12,7 @@ import record_mode
 
 
 # SET TO FALSE FOR TESTING WITHOUT ARDUINO
-TRANSMIT = False
+TRANSMIT = True
 
 # THIS WILL GET ASSIGNED DURING INITIALIZATION
 CONNECTION = None
@@ -28,7 +28,8 @@ def initialize():
     if (os.name == 'posix'):
         port_name = '/dev/ttyACM0'
     else:
-        port_name = 'COM1'  # UNTESTED
+        # TODO Sometimes COM3 sometimes COM4 depends on something I'm not sure of
+        port_name = 'COM4'  
 
     CONNECTION = serial.Serial(
         port=port_name,

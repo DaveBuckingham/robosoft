@@ -42,7 +42,7 @@ def unsilence_dpad():
 
 # INITIALIZE
 ui_display.update()
-# mctransmitter.initialize()
+mctransmitter.initialize()
 
 
 # ITERATE OVER OUTPUT

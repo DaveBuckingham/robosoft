@@ -2,3 +2,4 @@
 .idea/robosoft.iml
 *.dat
 *.pyc
+.idea/.name
