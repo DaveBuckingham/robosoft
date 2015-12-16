@@ -14,6 +14,7 @@ CONSULT global_data.py FOR DEFINITIONS -db
 import pygame
 import sys
 import time
+import global_data
 
 
 AXIS_ZERO_THRESHOLD = 0.13
@@ -23,15 +24,17 @@ AXIS_TIME_THRESHOLD = .15
 ################
 #  INITIALIZE  #
 ################
-pygame.init()
-pygame.joystick.init()
-gamepad_count = pygame.joystick.get_count()
-if gamepad_count:
-    for i in range(gamepad_count):
-        gamepad = pygame.joystick.Joystick(i)
-        gamepad.init()
-else:
-    sys.exit("no gamepad")
+def initialize_gamepad_reader():
+    pygame.init()
+    pygame.joystick.init()
+    gamepad_count = pygame.joystick.get_count()
+
+    if gamepad_count:
+        for i in range(gamepad_count):
+            gamepad = pygame.joystick.Joystick(i)
+            gamepad.init()
+    else:
+        sys.exit("no gamepad")
 
 last_axis_time = [0.0] * 6
 last_axis_value = [0.0] * 6
@@ -55,17 +58,14 @@ def dpad_convert(dpad_tuple):
     return -1
 
 
-################
-#     LOOP     #
-################
-while gamepad_count:
+def read_gamepad():
     for event in pygame.event.get():
 
         # BUTTONS
         if event.type == pygame.JOYBUTTONDOWN:
-            print '{} b {} {}'.format(event.joy, event.button, 1)
+            global_data.last_input_from_gamepad = '{} b {} {}'.format(event.joy, event.button, 1)
         if event.type == pygame.JOYBUTTONUP:
-            print '{} b {} {}'.format(event.joy, event.button, 0)
+            global_data.last_input_from_gamepad = '{} b {} {}'.format(event.joy, event.button, 0)
 
         # AXES
         if event.type == pygame.JOYAXISMOTION:
@@ -80,16 +80,18 @@ while gamepad_count:
 
         # DPAD
         if event.type == pygame.JOYHATMOTION:
-            print '{} d {} {}'.format(event.joy, event.hat, dpad_convert(event.value))
+            # global_data.last_input_from_gamepad = "AAAAAAAAAAAAAAAAAAAAAa"
+            global_data.last_input_from_gamepad = '{} d {} {}'.format(event.joy, event.hat, dpad_convert(event.value))
 
-
+    # ONLY WRITE TO global_data.last_input_from_gamepad INTERVAL "AXIS_TIME_THRESHOLD"
     now = time.time()
     for i in range(0, 6):
         if (new_axis_value[i] != last_axis_value[i]):
             if ((now - last_axis_time[i]) > AXIS_TIME_THRESHOLD):
                 last_axis_time[i] = now
                 last_axis_value[i] = new_axis_value[i]
-                print '{} a {} {}'.format(0, i, last_axis_value[i])
+                #global_data.last_input_from_gamepad = "AAAAAAAAAAAAAAAAAAAAAa"
+                global_data.last_input_from_gamepad = '{} a {} {}'.format(0, i, last_axis_value[i])
 
 
 pygame.quit()

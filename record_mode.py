@@ -19,6 +19,7 @@ save_filename_prefix = 'botwurst_command_record_'
 default_save_directory = 'botwurst_command_recordings'
 save_file_extension = '.dat'
 
+prev_time_stamp = None
 
 # TODO set recording limit]
 def make_directory(directory_name):
@@ -59,7 +60,8 @@ def initialize_record_mode(file_number):
 
     global_data.record = True
     global_data.record_file_number = file_number
-    global_data.record_start_time = datetime.datetime.now()
+    global prev_time_stamp
+    prev_time_stamp = datetime.datetime.now()
 
     # if save_directory already exists as subdirectory, nothing will happen
     make_directory(default_save_directory)
@@ -70,11 +72,12 @@ def append_instruction(instruction):
     Appends the instruction to record array in global data with time step from 0
     :param instruction: triple (PIN TYPE, PIN INDEX, VAL)
     """
-
+    global prev_time_stamp
     time_stamp = datetime.datetime.now()
 
     # TODO: look into note about datetime subtraction (is exact but may overflow)
-    time_diff = time_stamp - global_data.record_start_time
+    time_diff = time_stamp - prev_time_stamp
+    prev_time_stamp = time_stamp
 
     pin_type = instruction[0]
     pin_index = instruction[1]
@@ -164,12 +167,8 @@ class Playback_From_Array(threading.Thread):
             if global_data.playback_cancel:
                 break
 
-            temp_time_stamp = instruction[3]
-            time_diff = (temp_time_stamp - curr_time_stamp)
-            time.sleep(time_diff)
+            time.sleep(instruction[3])
             playback_instruction(instruction[0], instruction[1], instruction[2])
-
-            curr_time_stamp = temp_time_stamp
             ui_display.update()
 
         clear_playback_array()
@@ -180,13 +179,14 @@ class Playback_From_Array(threading.Thread):
 
 def playback_from_file(filename, is_file_tag=False, save_directory=None):
     clear_playback_array()
+    populate_playback_array_from_file(filename, is_file_tag, save_directory)
     global_data.playback = True
     global_data.playback_file_number = filename
 
-    populate_playback_array_from_file(filename, is_file_tag, save_directory)
-    playback_thread = Playback_From_Array(None, global_data.playback_array)
 
-    return playback_thread
+    #playback_thread = Playback_From_Array(None, global_data.playback_array)
+
+    #return playback_thread
 
 
 # TESTING FUNCTIONS: TO REMOVE

@@ -59,3 +59,6 @@ map_index = 0
 axis_0_locked = False
 axis_1_locked = False
 
+dict_return_value_keys = ['Signal_Type', 'Pin_Index', 'TX_Value']
+
+last_input_from_gamepad = None

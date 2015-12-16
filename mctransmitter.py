@@ -60,8 +60,6 @@ def tx_digital(pin_index, value):
     if (not isinstance(value, bool)):
         sys.exit("Non-boolean value arg to tx_digital")
     packed = struct.pack('!cB?', 'd', pin_index, value)
-    if (global_data.record):
-        record_mode.append_instruction(('d', pin_index, value))
     if (TRANSMIT):
         CONNECTION.write(packed)
     if (pin_index == 0):
@@ -79,8 +77,6 @@ def tx_analog(pin_index, value):
     if (not isinstance(value, int)):
         sys.exit("Non-int value arg to tx_digital: {}".format(value))
     packed = struct.pack('!cBB', 'a', pin_index, value)
-    if (global_data.record):
-        record_mode.append_instruction(('a', pin_index, value))
     if (TRANSMIT):
         CONNECTION.write(packed)
     if (pin_index == 0):
