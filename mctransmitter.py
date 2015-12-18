@@ -4,12 +4,10 @@
 
 import os
 import sys
-import time
 import serial
 import struct
 import global_data
-import record_mode
-
+import serial.tools.list_ports
 
 # SET TO FALSE FOR TESTING WITHOUT ARDUINO
 TRANSMIT = True
@@ -25,11 +23,15 @@ CONNECTION = None
 # INITIALIZE SERIAL CONNECTION
 def initialize():
     global CONNECTION
-    if (os.name == 'posix'):
-        port_name = '/dev/ttyACM0'
-    else:
-        # TODO Sometimes COM3 sometimes COM4 depends on something I'm not sure of
-        port_name = 'COM4'  
+
+    ports = list(serial.tools.list_ports.comports())
+    port_name = None
+
+    for p in ports:
+        if "Arduino" or "VID:PID" in p:
+            port_name = p[0]
+
+    global_data.ardiuno_port = port_name
 
     CONNECTION = serial.Serial(
         port=port_name,
@@ -60,7 +62,7 @@ def tx_digital(pin_index, value):
     if (not isinstance(value, bool)):
         sys.exit("Non-boolean value arg to tx_digital")
     packed = struct.pack('!cB?', 'd', pin_index, value)
-    if (TRANSMIT):
+    if (TRANSMIT and CONNECTION.port is not None):
         CONNECTION.write(packed)
     if (pin_index == 0):
         global_data.digital_0_sent = value

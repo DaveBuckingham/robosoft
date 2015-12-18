@@ -36,33 +36,32 @@ L2  -> Wavelength
 R2  -> Frequency"""
 
     def update(self, button_type, button_index, button_value):
-        return_values = None
+        to_transmit = None
 
         if (button_type == global_data.TYPE_BUTTON):
             if (button_index == global_data.BUTTON_X):
-                return_values = ('d',0, button_value)
+                to_transmit = ('d',0, button_value)
             elif (button_index == global_data.BUTTON_Y):
-                return_values = ('d',1, button_value)
+                to_transmit = ('d',1, button_value)
             elif ((button_index == global_data.BUTTON_A) and button_value):
-                return_values = ('d',0, not global_data.digital_0_sent)
+                to_transmit = ('d',0, not global_data.digital_0_sent)
             elif ((button_index == global_data.BUTTON_B) and button_value):
-                return_values = ('d',1, not global_data.digital_1_sent)
+                to_transmit = ('d',1, not global_data.digital_1_sent)
         elif (button_type == global_data.TYPE_AXIS):
             if (button_index == global_data.AXIS_LEFT_TRIGGER):
                 tx_value = 127 - (button_value / 2)
-                return_values = ('a',0, tx_value)
+                to_transmit = ('a',0, tx_value)
             if (button_index == global_data.AXIS_RIGHT_TRIGGER):
                 tx_value = 127
                 if (button_value > 0.0):
                     tx_value = 128 + (button_value / 2)
-                return_values = ('a',0, tx_value)
+                to_transmit = ('a',0, tx_value)
 
-        # TODO: FIGURE OUT WHY THIS IS HAPPENING
-        if return_values is None:
-            print "FOUND SOMETHING WEIRD"
+        # BUTTON PRESS SHOULD NOT RESULT IN ANY TRANSMISSION TO ARDUINO
+        if to_transmit is None:
             return None
 
-        basic_map.dict_return_values.update(dict(zip(global_data.dict_return_value_keys, return_values)))
+        basic_map.dict_return_values.update(dict(zip(global_data.dict_return_value_keys, to_transmit)))
 
         return basic_map.dict_return_values
 

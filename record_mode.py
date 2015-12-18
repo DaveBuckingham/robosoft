@@ -9,9 +9,7 @@ import mctransmitter
 import datetime
 import os
 import errno
-import time
-import threading
-import ui_display
+
 
 playback_file_tag = None
 
@@ -20,6 +18,7 @@ default_save_directory = 'botwurst_command_recordings'
 save_file_extension = '.dat'
 
 prev_time_stamp = None
+
 
 # TODO set recording limit]
 def make_directory(directory_name):
@@ -120,6 +119,11 @@ def clear_playback_array():
     global_data.playback_array = []
 
 
+def stop_playback():
+    global_data.playback = False
+    clear_playback_array()
+
+
 def populate_playback_array_from_file(filename, is_file_tag=False, save_directory=None):
     """
     Appends instructions from current file to playback array
@@ -150,31 +154,6 @@ def playback_instruction(pin_type, pin_index, value):
         mctransmitter.tx_analog(pin_index, value)
 
 
-class Playback_From_Array(threading.Thread):
-    def __init__(self, parent, queue):
-        threading.Thread.__init__(self)
-        self._queue = queue
-        self._parent = parent
-        self.start()
-
-    def run(self):
-        curr_time_stamp = 0
-        for instruction in self._queue:
-            while global_data.playback_paused:
-                if global_data.playback_cancel:
-                    break
-                time.sleep(.1)
-            if global_data.playback_cancel:
-                break
-
-            time.sleep(instruction[3])
-            playback_instruction(instruction[0], instruction[1], instruction[2])
-            ui_display.update()
-
-        clear_playback_array()
-        global_data.playback = False
-        global_data.playback_file_number = None
-        ui_display.update()
 
 
 def playback_from_file(filename, is_file_tag=False, save_directory=None):
@@ -183,97 +162,3 @@ def playback_from_file(filename, is_file_tag=False, save_directory=None):
     global_data.playback = True
     global_data.playback_file_number = filename
 
-
-    #playback_thread = Playback_From_Array(None, global_data.playback_array)
-
-    #return playback_thread
-
-
-# TESTING FUNCTIONS: TO REMOVE
-# class Print_Hello_Every_Sec(threading.Thread):
-#     def __init__(self, parent, queue):
-#         threading.Thread.__init__(self)
-#         self._queue = queue
-#         self._parent = parent
-#         self.start()
-#
-#     def run(self):
-#         for i in range(15):
-#             print "**********HELLO THERE**************"
-#             time.sleep(1)
-#
-# class Pause_Unpause(threading.Thread):
-#     def __init__(self, parent, queue):
-#         threading.Thread.__init__(self)
-#         self._queue = queue
-#         self._parent = parent
-#         self.start()
-#
-#     def run(self):
-#         time.sleep(2)
-#         global_data.playback_paused = True
-#         print "PAUSING"
-#         time.sleep(5)
-#         global_data.playback_cancel = True
-#         print "CANCELLING"
-#         time.sleep(5)
-#         print "UNPAUSING"
-#         global_data.playback_paused = False
-#
-#
-# def create_dummy_instruction_file(file_tag):
-#     short_delay = 0.1
-#     long_delay = 1
-#
-#     initialize_record_mode(file_tag)
-#     print_global_record_variables()
-#
-#     i = 1
-#     j = 0
-#
-#     for iterator in range(10):
-#         i_is_even = (1 == i%2)
-#
-#         digital_instruction = ('d', 0, i_is_even)
-#         append_instruction(digital_instruction)
-#
-#         time.sleep(short_delay)
-#
-#         digital_instruction = ('d', 1, not i_is_even)
-#         append_instruction(digital_instruction)
-#
-#         time.sleep(short_delay)
-#
-#         val = abs((j % 510) - 255)
-#
-#         analog_instruction = ('a', 0, val)
-#         append_instruction(analog_instruction)
-#
-#         time.sleep(short_delay)
-#
-#         analog_instruction = ('a', 1, 255 - val)
-#         append_instruction(analog_instruction)
-#
-#         time.sleep(long_delay)
-#
-#         i = i + 1
-#         j = j + 20
-#
-#     create_record_file()
-#
-# def main():
-#     test_file_tag = 5
-#     # create_dummy_instruction_file(test_file_tag)
-#
-#     pause_thread = Pause_Unpause(None, None)
-#     playback_thread = playback_from_file(test_file_tag, True)
-#     print_hello_thread = Print_Hello_Every_Sec(None, None)
-#
-#     print_hello_thread.join()
-#     playback_thread.join()
-#     pause_thread.join()
-#
-#     print_global_record_variables()
-#
-#
-# main()

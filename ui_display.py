@@ -75,6 +75,14 @@ def update():
         playback_message = "PLAYING BACK FROM FILE NUMBER: " + str(global_data.playback_file_number)
     out += playback_message
 
+    out += ("\n")
+    arduino_port = "NO ARDUINO DETECTED"
+
+    if global_data.ardiuno_port is not None:
+        arduino_port = "ARDIUNO AT PORT: " + global_data.ardiuno_port
+
+    out += arduino_port
+
     # CLEAR SCREEN
     if (os.name == 'posix'):
         os.system('clear')
