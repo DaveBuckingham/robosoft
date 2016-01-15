@@ -25,19 +25,20 @@ CONNECTION = None
 # INITIALIZE SERIAL CONNECTION
 def initialize():
     global CONNECTION
-    if (os.name == 'posix'):
-        port_name = '/dev/ttyACM0'
-    else:
-        # TODO Sometimes COM3 sometimes COM4 depends on something I'm not sure of
-        port_name = 'COM4'  
 
-    CONNECTION = serial.Serial(
-        port=port_name,
-        baudrate=9600,
-        parity=serial.PARITY_NONE,
-        stopbits=serial.STOPBITS_ONE,
-        bytesize=serial.EIGHTBITS
-    )
+    if (TRANSMIT):
+        if (os.name == 'posix'):
+            port_name = '/dev/ttyACM0'
+        else:
+            port_name = 'COM4'  
+
+        CONNECTION = serial.Serial(
+            port=port_name,
+            baudrate=9600,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            bytesize=serial.EIGHTBITS
+        )
 
 
 ##############################
@@ -88,6 +89,21 @@ def tx_analog(pin_index, value):
     elif (pin_index == 1):
         global_data.analog_1_sent = value
     #receive()
+
+
+# GAIT TX
+def tx_gait(event_list):
+    packed = struct.pack('!c', 't')
+    if (TRANSMIT):
+        CONNECTION.write(packed)
+    for event in event_list:
+        packed = struct.pack('!LBBBB', event['time'], event['motor_index'], event['direction'], event['pwm'], event['skip'])
+        if (TRANSMIT):
+            CONNECTION.write(packed)
+            #print CONNECTION.readline()
+
+
+
 
 
 ##############################
