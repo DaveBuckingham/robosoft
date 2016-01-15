@@ -181,9 +181,10 @@ void loop() {
     cmd_type = Serial.read();
     delay(SERIAL_DELAY);
 
-    if (cmd_type == 'd') {
+    if (cmd_type == 'a') {
         cmd_index = Serial.read();
         if (cmd_index >= 0 && cmd_index < 3) {
+	    cmd_value = Serial.read();
             if (cmd_value == 0) {
                 analogWrite(PWM_PINS[cmd_index], 0);
             }
@@ -197,6 +198,7 @@ void loop() {
             }
         }
         if (cmd_index == 3) {
+	    cmd_value = Serial.read();
             if (cmd_value) {
                 pause();
             }

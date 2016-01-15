@@ -12,25 +12,6 @@ import mctransmitter  # COM WITH ARDUINO
 
 
 
-def pause():
-    print pause
-    mctransmitter.tx_digital(3, 1)
-
-def unpause():
-    print play
-    mctransmitter.tx_digital(3, 0)
-
-def stop():
-    lock_current_motor = true
-    mctransmitter.tx_digital(current_motor, 0)
-
-def contract():
-    lock_current_motor = true
-    mctransmitter.tx_digital(current_motor, 1)
-
-def expand():
-    lock_current_motor = true
-    mctransmitter.tx_digital(current_motor, 2)
 
 
 EXPAND = 0
@@ -111,17 +92,6 @@ ANIMATION_CONTINUE = 23
 
 animation_frame = 0
 
-#variables = [
-#    ('expanded_delay', 0),
-#    ('contract_time', 0),
-#    ('contracted_delay', 0),
-#    ('expand_time', 0),
-#    ('contract_speed', 0),
-#    ('expand_speed', 0),
-#    ('motor_1_offset', 0),
-#    ('motor_2_offset', 0),
-#]
-
 variable_names = [
     'expanded_delay',
     'contract_time',
@@ -136,14 +106,14 @@ variable_names = [
 VARIABLE_MAXS = [60000, 60000, 60000, 60000, 255, 255, 60000, 60000]
 
 variables = {
-    variable_names[0]: 100,
-    variable_names[1]: 100,
-    variable_names[2]: 100,
-    variable_names[3]: 100,
-    variable_names[4]: 200,
-    variable_names[5]: 200,
-    variable_names[6]: 150,
-    variable_names[7]: 250,
+    variable_names[0]: 1000,
+    variable_names[1]: 1000,
+    variable_names[2]: 1000,
+    variable_names[3]: 1000,
+    variable_names[4]: 150,
+    variable_names[5]: 150,
+    variable_names[6]: 1000,
+    variable_names[7]: 500,
 }
 
 
@@ -336,9 +306,11 @@ while True:
                 elif (event.key == KEY_LEFT):
                     if (motorstate[current_motor] == 0):
                         motorstate[current_motor] = 1
+			mctransmitter.tx_analog(current_motor, 1)
                 elif (event.key == KEY_RIGHT):
                     if (motorstate[current_motor] == 0):
                         motorstate[current_motor] = 2
+			mctransmitter.tx_analog(current_motor, 2)
                 #else:
                     #print event.key
 
@@ -368,15 +340,19 @@ while True:
                 if (event.key == KEY_SPACE):
                     if (walk_mode == WALK_PLAY):
                         walk_mode = WALK_PAUSE
+			mctransmitter.tx_analog(3, 0)
                     elif (walk_mode == WALK_PAUSE):
                         walk_mode = WALK_PLAY
+			mctransmitter.tx_analog(3, 1)
                     elif (walk_mode == WALK_RESET):
                         walk_mode = WALK_PLAY
+			mctransmitter.tx_analog(3, 1)
 
             refresh()
 
         elif event.type == pygame.KEYUP:
             if ((event.key == KEY_LEFT) or (event.key == KEY_RIGHT)):
                 motorstate[current_motor] = 0
+		mctransmitter.tx_analog(current_motor, 0)
             refresh()
 
