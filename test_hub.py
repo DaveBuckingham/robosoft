@@ -2,6 +2,7 @@
 
 # BY DAVE, FOR TESTING GAITS
 
+import time
 import subprocess
 import os
 import sys
@@ -11,9 +12,6 @@ import pygame
 import mctransmitter  # COM WITH ARDUINO
 
 
-
-
-
 EXPAND = 0
 CONTRACT = 1
 
@@ -21,7 +19,7 @@ NUM_MOTORS = 3
 
 # FOR UI
 current_motor = 0
-current_variable = 0
+highlighted_variable = 0
 
 # FOR MANUAL MOTOR CONTROL
 motorstate = [0, 0, 0]   # 0->stopped   1->expanding    2->contracting
@@ -51,6 +49,7 @@ KEY_TAB      = 9
 KEY_RETURN   = 13 
 KEY_SPACE    = 32
 KEY_TRANSFER = 116  # 't'
+KEY_QUIT     = 113  # 'q'
 
 HIGHLIGHT = (255, 255, 0)
 WHITE = (200, 200, 255)
@@ -119,7 +118,6 @@ variables = {
 
 
 def transfer():
-    print "transmitting gait"
     event_list = []
     cycle_length = variables['expanded_delay'] +  \
                    variables['contract_time'] + \
@@ -128,55 +126,55 @@ def transfer():
 
 
     for i in range(0, NUM_MOTORS):
-        time = 0
+        activation_time = 0
         skip = 0
         if (i == 1):
-            time = variables['motor_1_offset']
+            activation_time = variables['motor_1_offset']
         elif (i == 2):
-            time = variables['motor_2_offset']
+            activation_time = variables['motor_2_offset']
 
-        time = (time + variables['expanded_delay'])
-        if (time >= cycle_length):
-            time = time % cycle_length
+        activation_time = (activation_time + variables['expanded_delay'])
+        if (activation_time >= cycle_length):
+            activation_time = activation_time % cycle_length
             skip = 1
         event_list.append({
-            'time': time,
+            'activation_time': activation_time,
             'motor_index': i,
             'direction': CONTRACT,
             'pwm':variables['contract_speed'],
             'skip': skip,
         })
 
-        time = (time + variables['contract_time'])
-        if (time >= cycle_length):
-            time = time % cycle_length
+        activation_time = (activation_time + variables['contract_time'])
+        if (activation_time >= cycle_length):
+            activation_time = activation_time % cycle_length
             skip = 1
         event_list.append({
-            'time': time,
+            'activation_time': activation_time,
             'motor_index': i,
             'direction': CONTRACT,
             'pwm': 0,
             'skip': skip,
         })
 
-        time = (time + variables['contracted_delay'])
-        if (time >= cycle_length):
-            time = time % cycle_length
+        activation_time = (activation_time + variables['contracted_delay'])
+        if (activation_time >= cycle_length):
+            activation_time = activation_time % cycle_length
             skip = 1
         event_list.append({
-            'time': time,
+            'activation_time': activation_time,
             'motor_index': i,
             'direction': EXPAND,
             'pwm': variables['expand_speed'],
             'skip': skip,
         })
 
-        time = (time + variables['expand_time'])
-        if (time >= cycle_length):
-            time = time % cycle_length
+        activation_time = (activation_time + variables['expand_time'])
+        if (activation_time >= cycle_length):
+            activation_time = activation_time % cycle_length
             skip = 1
         event_list.append({
-            'time': time,
+            'activation_time': activation_time,
             'motor_index': i,
             'direction': EXPAND,
             'pwm': 0,
@@ -184,17 +182,17 @@ def transfer():
         })
 
      # SORT
-    event_list = sorted(event_list, key=lambda k: k['time']) 
+    event_list = sorted(event_list, key=lambda k: k['activation_time']) 
 
     mctransmitter.tx_gait(event_list)
 
-    #for event in event_list:
-    #    print "time: " + str(event['time'])
-    #    print "motor: " + str(event['motor_index'])
-    #    print "dir: " + str(event['direction'])
-    #    print "pwm: " + str(event['pwm'])
-    #    print "skip: " + str(event['skip'])
-    #    print ""
+    print "transmitting gait"
+    for event in event_list:
+        print "time: " + str(event['activation_time']),
+        print "motor: " + str(event['motor_index']),
+        print "dir: " + str(event['direction']),
+        print "pwm: " + str(event['pwm']),
+        print "skip: " + str(event['skip'])
 
 
 
@@ -224,11 +222,11 @@ def refresh():
 
     colors = [WHITE] * len(variables)
     if (control_mode == CONTROL_TRANSMIT):
-        colors[current_variable] = HIGHLIGHT
+        colors[highlighted_variable] = HIGHLIGHT
     for i in range(0, len(variables)):
         label = myfont.render(variable_names[i], 1, colors[i])
         screen.blit(label, (200, i * 15))
-        if (input_state and i == current_variable):
+        if (input_state and i == highlighted_variable):
             label = myfont.render("= " + str(input_value), 1, colors[i])
         else:
             label = myfont.render("= " + str(variables[variable_names[i]]), 1, colors[i])
@@ -276,7 +274,7 @@ while True:
 
     if (walk_mode == WALK_PLAY):
         frame += 1
-        if ((frame % 100000) == 0):
+        if ((frame % 10000) == 0):
             animation_frame = (animation_frame + 1)
             if (animation_frame >= len(ANIMATION)):
                 animation_frame = ANIMATION_CONTINUE
@@ -284,75 +282,87 @@ while True:
 
 
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit();  #sys.exit() if sys is imported
 
-        elif event.type == pygame.KEYDOWN:
-            if (event.key == KEY_TRANSFER):
-                walk_mode = WALK_RESET
-                transfer()
-            elif (event.key == KEY_TAB):
-                control_mode = (control_mode + 1) % 3
-                input_value = 0
-                input_state = False
-                animation_frame = 0
-                walk_mode = WALK_RESET
+        # QUIT
+        if ((event.type == pygame.QUIT) or ((event.type == pygame.KEYDOWN) and (event.key == KEY_QUIT))):
+            pygame.quit();
 
-            elif (control_mode == CONTROL_MANUAL):
-                if (event.key == KEY_UP):
+
+        # SWITCH COLUMN
+        elif ((event.type == pygame.KEYDOWN) and (event.key == KEY_TAB)):
+            control_mode = (control_mode + 1) % 3
+            input_value = 0
+            input_state = False
+
+
+        # LEFT COLUMN
+        elif (control_mode == CONTROL_MANUAL):
+            if (event.type == pygame.KEYDOWN):
+                if ((event.key == KEY_UP) and motorstate[current_motor] == 0):
                     current_motor = (current_motor - 1) % NUM_MOTORS
-                elif (event.key == KEY_DOWN):
+                elif ((event.key == KEY_DOWN) and motorstate[current_motor] == 0):
                     current_motor = (current_motor + 1) % NUM_MOTORS
                 elif (event.key == KEY_LEFT):
                     if (motorstate[current_motor] == 0):
                         motorstate[current_motor] = 1
-			mctransmitter.tx_analog(current_motor, 1)
+                        mctransmitter.tx_analog(current_motor, 1)
                 elif (event.key == KEY_RIGHT):
                     if (motorstate[current_motor] == 0):
                         motorstate[current_motor] = 2
-			mctransmitter.tx_analog(current_motor, 2)
-                #else:
-                    #print event.key
+                        mctransmitter.tx_analog(current_motor, 2)
+            elif (event.type == pygame.KEYUP):
+                if ((event.key == KEY_LEFT) or (event.key == KEY_RIGHT)):
+                    motorstate[current_motor] = 0
+                    mctransmitter.tx_analog(current_motor, 0)
 
-            elif (control_mode == CONTROL_TRANSMIT):
-                if (event.key == KEY_RETURN):
+
+        # MIDDLE COLUMN
+        elif (control_mode == CONTROL_TRANSMIT):
+            if event.type == pygame.KEYDOWN:
+
+                if (event.key == KEY_TRANSFER):
+                    walk_mode = WALK_RESET
+                    animation_frame = 0
+                    transfer()
+
+                elif (event.key == KEY_RETURN):
                     if (input_state):
-                        if (input_value >= 0 and input_value <= VARIABLE_MAXS[current_variable]):
-                            variables[variable_names[current_variable]] = input_value
-                            current_variable = (current_variable + 1) % len(variables)
+                        if (input_value >= 0 and input_value <= VARIABLE_MAXS[highlighted_variable]):
+                            variables[variable_names[highlighted_variable]] = input_value
+                            highlighted_variable = (highlighted_variable + 1) % len(variables)
                         input_state = False
                     else:
                         input_value = 0
                         input_state = True
+
+                # TYPING IN NEW VALUE
                 elif (input_state and event.key >= 48 and event.key <= 57):
                     input_integer = event.key - 48
                     input_value = (input_value * 10) + input_integer
+
                 elif (event.key == KEY_UP):
-                    current_variable = (current_variable - 1) % len(variables)
+                    highlighted_variable = (highlighted_variable - 1) % len(variables)
                     input_value = 0
                     input_state = False
                 elif (event.key == KEY_DOWN):
-                    current_variable = (current_variable + 1) % len(variables)
+                    highlighted_variable = (highlighted_variable + 1) % len(variables)
                     input_value = 0
                     input_state = False
 
-            elif (control_mode == CONTROL_WALK):
-                if (event.key == KEY_SPACE):
-                    if (walk_mode == WALK_PLAY):
-                        walk_mode = WALK_PAUSE
-			mctransmitter.tx_analog(3, 0)
-                    elif (walk_mode == WALK_PAUSE):
-                        walk_mode = WALK_PLAY
-			mctransmitter.tx_analog(3, 1)
-                    elif (walk_mode == WALK_RESET):
-                        walk_mode = WALK_PLAY
-			mctransmitter.tx_analog(3, 1)
 
-            refresh()
+        # RIGHT COLUMN
+        elif (control_mode == CONTROL_WALK):
+            if ((event.type == pygame.KEYDOWN) and (event.key == KEY_SPACE)):
+                if (walk_mode == WALK_PLAY):
+                    walk_mode = WALK_PAUSE
+                    mctransmitter.tx_analog(3, 0)
+                elif (walk_mode == WALK_PAUSE):
+                    walk_mode = WALK_PLAY
+                    mctransmitter.tx_analog(3, 1)
+                elif (walk_mode == WALK_RESET):
+                    walk_mode = WALK_PLAY
+                    mctransmitter.tx_analog(3, 1)
 
-        elif event.type == pygame.KEYUP:
-            if ((event.key == KEY_LEFT) or (event.key == KEY_RIGHT)):
-                motorstate[current_motor] = 0
-		mctransmitter.tx_analog(current_motor, 0)
-            refresh()
 
+        refresh()
+    mctransmitter.receive();

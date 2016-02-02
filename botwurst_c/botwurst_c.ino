@@ -12,7 +12,7 @@
 //////////////////////////////////////
 
 // SERIAL COM
-#define SERIAL_DELAY 250  // MILLISECONDS
+#define SERIAL_DELAY 100  // MILLISECONDS
 #define BAUD 9600
 #define SERIAL_CONFIG SERIAL_8N1
 
@@ -43,7 +43,7 @@ char print_buffer[100];
 //////////////////////////////////////
 
 // STORAGE FOR DATA READ FROM SERIAL COM
-char cmd_type;
+unsigned char cmd_type;
 byte cmd_index;
 byte cmd_value;
 
@@ -69,7 +69,9 @@ void pause() {
 }
 
 void unpause() {
-    reference += millis() - pause_start;
+    reference += (millis() - pause_start);
+    //sprintf(print_buffer, "reference: %ul  time: %ul  pause_start: %ul\n", reference, millis(), pause_start);
+    //Serial.print(print_buffer);
     analogWrite(PWM_PIN_0, current_pwms[0]);
     analogWrite(PWM_PIN_1, current_pwms[1]);
     analogWrite(PWM_PIN_2, current_pwms[2]);
@@ -77,6 +79,12 @@ void unpause() {
     return;
 }
 
+void reset() {
+    pause();
+    reference = millis();
+    then = 0;
+    event_index = 0;
+}
 
 struct event_s {
     unsigned long time;
@@ -110,10 +118,6 @@ void read_to_ulong(unsigned long *ulong_pointer) {
 
 void setup() {
 
-    pause();
-    reference = pause_start;
-    event_index = 0;
-
     // SERIAL COM
     Serial.begin(BAUD, SERIAL_CONFIG);
     
@@ -125,6 +129,15 @@ void setup() {
     pinMode(DIRECTION_PIN_1, OUTPUT);
     pinMode(DIRECTION_PIN_2, OUTPUT);
 
+    for (int i = 0; i < NUM_EVENTS; i++) {
+        events[i].time = 99999999999;
+        events[i].motor_index = 0;
+        events[i].direction = 0;
+        events[i].pwm = 0;
+        events[i].skip = 0;
+    }
+
+    reset();
 }
 
 
@@ -133,6 +146,9 @@ void setup() {
 //////////////////////////////////////
 
 void loop() {
+
+    //sprintf(print_buffer, "loop\n");
+    //Serial.print(print_buffer);
 
     //////////////////////////
     //        GAIT          //
@@ -150,6 +166,9 @@ void loop() {
 
             if (now >= event->time) {
 
+                sprintf(print_buffer, "index: %d  event_time: %lu  actual_time: %lu  reference: %lu\n", event_index, event->time, now, reference);
+                Serial.print(print_buffer);
+
                 if (event->skip) {
                     event->skip = 0;
                 }
@@ -164,6 +183,7 @@ void loop() {
                 if (event_index == NUM_EVENTS) {
                     event_index = 0;
                     reference = millis();
+                    then = 0;
                 }
             }
         }
@@ -180,6 +200,7 @@ void loop() {
     }
     cmd_type = Serial.read();
     delay(SERIAL_DELAY);
+
 
     if (cmd_type == 'a') {
         cmd_index = Serial.read();
@@ -200,15 +221,19 @@ void loop() {
         if (cmd_index == 3) {
 	    cmd_value = Serial.read();
             if (cmd_value) {
-                pause();
-            }
-            else {
                 unpause();
             }
+            else {
+                pause();
+            }
         }
+        sprintf(print_buffer, "type: %c, index: %d, value: %d\n", cmd_type, cmd_index, cmd_value);
+        Serial.print(print_buffer);
     }
 
     else if (cmd_type == 't') {
+        sprintf(print_buffer, "received gait:\n");
+        Serial.print(print_buffer);
         for (int i = 0; i < NUM_EVENTS; i++) {
             delay(SERIAL_DELAY);
             read_to_ulong(&events[i].time);
@@ -216,11 +241,20 @@ void loop() {
             events[i].direction = Serial.read();
             events[i].pwm = Serial.read();
             events[i].skip = Serial.read();
-            //sprintf(print_buffer, "time: %lu  motor: %d  dir: %d  pwm: %d  skip: %d\n", events[i].time, events[i].motor_index, events[i].direction, events[i].pwm, events[i].skip);
-            //Serial.print(print_buffer);
+            sprintf(print_buffer, "time: %lu  motor: %d  dir: %d  pwm: %d  skip: %d\n", events[i].time, events[i].motor_index, events[i].direction, events[i].pwm, events[i].skip);
+            Serial.print(print_buffer);
         }
-        pause();
+        reset();
     }
+
+    //else if (cmd_type == 'r') {
+    //    reset();
+    //    sprintf(print_buffer, "reset");
+    //    Serial.print(print_buffer);
+    //}
+
+    //sprintf(print_buffer, "type: %c\n", cmd_type);
+    //Serial.print(print_buffer);
 
 }
 

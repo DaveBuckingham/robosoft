@@ -10,6 +10,7 @@ import struct
 import global_data
 import record_mode
 
+TRANSMIT_DELAY = 0.08  # SECONDS
 
 # SET TO FALSE FOR TESTING WITHOUT ARDUINO
 TRANSMIT = True
@@ -37,7 +38,8 @@ def initialize():
             baudrate=9600,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS
+            bytesize=serial.EIGHTBITS,
+            timeout=0   # don't block when reading
         )
 
 
@@ -97,12 +99,16 @@ def tx_gait(event_list):
     if (TRANSMIT):
         CONNECTION.write(packed)
     for event in event_list:
-        packed = struct.pack('!LBBBB', event['time'], event['motor_index'], event['direction'], event['pwm'], event['skip'])
+        time.sleep(TRANSMIT_DELAY)
+        packed = struct.pack('!LBBBB', event['activation_time'], event['motor_index'], event['direction'], event['pwm'], event['skip'])
         if (TRANSMIT):
             CONNECTION.write(packed)
             #print CONNECTION.readline()
 
-
+#def tx_reset():
+#    packed = struct.pack('!c', 'r')
+#    if (TRANSMIT):
+#        CONNECTION.write(packed)
 
 
 
@@ -113,6 +119,8 @@ def tx_gait(event_list):
 # READ RESPONSE FROM ARDUINO AND
 # SET VARIABLES IN global_data.py
 def receive():
-    print "receiving..."
-    print CONNECTION.readline()
+    line = CONNECTION.readline()
+    if (len(line) > 0):
+        sys.stdout.write(line);
+        #print line;
 
