@@ -166,14 +166,13 @@ void loop() {
 
             if (now >= event->time) {
 
-                sprintf(print_buffer, "index: %d  event_time: %lu  actual_time: %lu  reference: %lu\n", event_index, event->time, now, reference);
-                Serial.print(print_buffer);
-
                 if (event->skip) {
                     event->skip = 0;
                 }
 
                 else {
+                    sprintf(print_buffer, "index: %d  event_time: %lu  actual_time: %lu  reference: %lu\n", event_index, event->time, now, reference);
+                    Serial.print(print_buffer);
                     current_pwms[event->motor_index] = event->pwm;
                     analogWrite(PWM_PINS[event->motor_index], event->pwm);
                     digitalWrite(DIRECTION_PINS[event->motor_index], event->direction);

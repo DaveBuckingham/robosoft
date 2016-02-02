@@ -105,14 +105,14 @@ variable_names = [
 VARIABLE_MAXS = [60000, 60000, 60000, 60000, 255, 255, 60000, 60000]
 
 variables = {
-    variable_names[0]: 1000,
-    variable_names[1]: 1000,
-    variable_names[2]: 1000,
-    variable_names[3]: 1000,
+    variable_names[0]: 6000,
+    variable_names[1]: 6000,
+    variable_names[2]: 6000,
+    variable_names[3]: 6000,
     variable_names[4]: 150,
     variable_names[5]: 150,
-    variable_names[6]: 1000,
-    variable_names[7]: 500,
+    variable_names[6]: 2000,
+    variable_names[7]: 4000,
 }
 
 
@@ -133,6 +133,7 @@ def transfer():
         elif (i == 2):
             activation_time = variables['motor_2_offset']
 
+        # START CONTRACTING
         activation_time = (activation_time + variables['expanded_delay'])
         if (activation_time >= cycle_length):
             activation_time = activation_time % cycle_length
@@ -145,6 +146,7 @@ def transfer():
             'skip': skip,
         })
 
+        # STOP CONTRACTING
         activation_time = (activation_time + variables['contract_time'])
         if (activation_time >= cycle_length):
             activation_time = activation_time % cycle_length
@@ -157,6 +159,7 @@ def transfer():
             'skip': skip,
         })
 
+        # START EXPANDING
         activation_time = (activation_time + variables['contracted_delay'])
         if (activation_time >= cycle_length):
             activation_time = activation_time % cycle_length
@@ -169,6 +172,7 @@ def transfer():
             'skip': skip,
         })
 
+        # STOP EXPANDING
         activation_time = (activation_time + variables['expand_time'])
         if (activation_time >= cycle_length):
             activation_time = activation_time % cycle_length
