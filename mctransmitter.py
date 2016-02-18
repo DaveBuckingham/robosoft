@@ -100,7 +100,7 @@ def tx_gait(event_list):
         CONNECTION.write(packed)
     for event in event_list:
         time.sleep(TRANSMIT_DELAY)
-        packed = struct.pack('!LBBBB', event['activation_time'], event['motor_index'], event['direction'], event['pwm'], event['skip'])
+        packed = struct.pack('!BLBB', event['motor_index'], event['activation_time'], event['direction'], event['pwm'])
         if (TRANSMIT):
             CONNECTION.write(packed)
             #print CONNECTION.readline()

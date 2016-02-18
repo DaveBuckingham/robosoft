@@ -1,0 +1,74 @@
+transmitting gait
+time: 0
+motor: 0
+dir: 0
+pwm: 0
+skip: 1
+
+time: 50
+motor: 1
+dir: 0
+pwm: 200
+skip: 1
+
+time: 50
+motor: 2
+dir: 1
+pwm: 0
+skip: 1
+
+time: 100
+motor: 0
+dir: 1
+pwm: 200
+skip: 0
+
+time: 150
+motor: 1
+dir: 0
+pwm: 0
+skip: 1
+
+time: 150
+motor: 2
+dir: 0
+pwm: 200
+skip: 1
+
+time: 200
+motor: 0
+dir: 1
+pwm: 0
+skip: 0
+
+time: 250
+motor: 1
+dir: 1
+pwm: 200
+skip: 0
+
+time: 250
+motor: 2
+dir: 0
+pwm: 0
+skip: 1
+
+time: 300
+motor: 0
+dir: 0
+pwm: 200
+skip: 0
+
+time: 350
+motor: 1
+dir: 1
+pwm: 0
+skip: 0
+
+time: 350
+motor: 2
+dir: 1
+pwm: 200
+skip: 0
+
+307
