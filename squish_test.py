@@ -130,6 +130,23 @@ connection = serial.Serial(
 )
 
 
+def load():
+    print "Loading saved gait."
+    try:
+        f = open('gait.dat', 'r')
+        for var in vars.items():
+            for i in range(0, NUM_MOTORS):
+                var[1][i] = int(f.readline())
+    except:
+        print "Failed to load saved gait. Using defaults."
+
+def save():
+    f = open('gait.dat', 'w')
+    for var in vars.items():
+        for i in range(0, NUM_MOTORS):
+            f.write(str(var[1][i]))
+            f.write("\n")
+
 
 
 def transfer():
@@ -288,7 +305,10 @@ def draw_graphs():
 pygame.init()
 myfont = pygame.font.SysFont("monospace", 17, bold=True)
 screen = pygame.display.set_mode((1000, 800))
+load()
 refresh()
+
+
 
 
 
@@ -311,8 +331,9 @@ while True:
 
         # QUIT
         if ((event.type == pygame.QUIT) or ((event.type == pygame.KEYDOWN) and (event.key == KEY_QUIT))):
-            pygame.quit();
-            sys.exit();
+            save()
+            pygame.quit()
+            sys.exit()
 
 
         # SWITCH COLUMN
