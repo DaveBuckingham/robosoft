@@ -16,8 +16,10 @@
 #define BAUD 9600
 #define SERIAL_CONFIG SERIAL_8N1
 
-const byte PWM_PINS[] = {5, 7, 9, 11};
-const byte DIRECTION_PINS[] = {32, 34, 36, 38};
+// const byte PWM_PINS[] = {5, 7, 9, 11};
+// const byte DIRECTION_PINS[] = {32, 34, 36, 38};
+const byte PWM_PINS[] = {2, 2, 2, 2};
+const byte DIRECTION_PINS[] = {3, 3, 3, 3};
 
 #define NUM_MOTORS 4
 #define EVENTS_PER_MOTOR 4
@@ -169,8 +171,10 @@ void loop() {
                 if (now - reference[motor_i] >= event->time) {
 
                     int error = now - reference[motor_i] - event->time;
-                    sprintf(print_buffer, "motor: %d   event: %d   time: %d   error: %d\n",
+                    sprintf(print_buffer, "motor: %d  dir: %d  pwm: %-3d event: %d   time: %-4d   error: %-4d\n",
                                                                                             motor_i,
+                                                                                            event->direction,
+                                                                                            event->pwm,
                                                                                             event_index[motor_i],
                                                                                             event->time,
                                                                                             error);
@@ -182,7 +186,8 @@ void loop() {
                     event_index[motor_i]++;
                     if (event_index[motor_i] == EVENTS_PER_MOTOR) {
                         event_index[motor_i] = 0;
-                        reference[motor_i] = millis();
+                        // reference[motor_i] = millis();
+                        reference[motor_i] = now;
                     }
                 }
             }
