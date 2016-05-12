@@ -12,7 +12,7 @@ Print to stdout.
 
 
 ui_hub.py
-Read button events via pipe from gamepad_interface
+Read button events via pipe from gamepad_to_stdout.py
 Send them to ui_map.py
 Call ui_display.py
 
